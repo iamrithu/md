@@ -1,26 +1,32 @@
 // ignore_for_file: sort_child_properties_last, prefer_const_literals_to_create_immutables, prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:md/config/config.dart';
+import 'package:md/provider/provider.dart';
 import 'package:md/screen/driver-screen/driverScreen.dart';
 
 import '../../widgets/customDetailContainer.dart';
 import '../../widgets/globalButtonWidget.dart';
 import '../check-screen/visualCheck/visualCheckScreen.dart';
+import '../incident-screen/incidentScreen.dart';
 
-class ReportScreen extends StatefulWidget {
+class ReportScreen extends ConsumerStatefulWidget {
   const ReportScreen({Key? key}) : super(key: key);
 
   @override
   _ReportScreenState createState() => _ReportScreenState();
 }
 
-class _ReportScreenState extends State<ReportScreen> {
+class _ReportScreenState extends ConsumerState<ReportScreen> {
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
+    final data = ref.watch(vehicleDetailProvider)[0];
+
     return SafeArea(
       child: Scaffold(
         backgroundColor: Config.bg,
@@ -98,36 +104,42 @@ class _ReportScreenState extends State<ReportScreen> {
                         height: 20,
                       ),
                       CustomDetailContainer(
+                        isText: false,
                         width: width,
                         height: height,
                         img: "assets/file-text.png",
                         lable: "Report",
-                        value: "AA16TGY-10-01-2023-12-24",
+                        value:
+                            "${data["number_plate"]}-${DateFormat("ddMMyyyy-hhmmss").format(DateTime.now())}",
                       ),
                       SizedBox(
                         height: 10,
                       ),
                       CustomDetailContainer(
+                        isText: false,
                         width: width,
                         height: height,
                         img: "assets/clock.png",
                         lable: "Date",
-                        value: "10/01/2023 12:24",
+                        value:
+                            "${DateFormat("dd-MM-yyyy").format(DateTime.now())}",
                       ),
                       SizedBox(
                         height: 10,
                       ),
                       CustomDetailContainer(
+                        isText: false,
                         width: width,
                         height: height,
                         img: "assets/truck.png",
                         lable: "Number Plate",
-                        value: "AA16TGY",
+                        value: "${data["number_plate"]}",
                       ),
                       SizedBox(
                         height: 10,
                       ),
                       CustomDetailContainer(
+                        isText: true,
                         width: width,
                         height: height,
                         img: "assets/sunrise.png",
@@ -143,6 +155,26 @@ class _ReportScreenState extends State<ReportScreen> {
                             CustomButton(
                               radius: 4,
                               txtColor: Config.white,
+                              boderColor: Config.white,
+                              width: width,
+                              height: height,
+                              click: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => IncidentScreen(),
+                                  ),
+                                );
+                              },
+                              bgColor: Config.theme,
+                              lable: "Incident",
+                            ),
+                            SizedBox(
+                              height: 4,
+                            ),
+                            CustomButton(
+                              radius: 4,
+                              boderColor: Config.white,
+                              txtColor: Config.white,
                               width: width,
                               height: height,
                               click: () {
@@ -153,7 +185,7 @@ class _ReportScreenState extends State<ReportScreen> {
                                 );
                               },
                               bgColor: Config.theme,
-                              lable: "Next",
+                              lable: "Report",
                             ),
                           ],
                         ),

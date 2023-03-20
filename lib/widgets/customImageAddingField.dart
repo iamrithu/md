@@ -38,9 +38,6 @@ class _CustomImageAddingFieldState
     // TODO: implement initState
     super.initState();
 
-    print(widget.type);
-    print(widget.lable);
-    print(widget.dataList.toString());
     if (widget.dataList.isEmpty) return;
 
     setState(() {
@@ -199,6 +196,7 @@ class _CustomImageAddingFieldState
                                               setState(() {
                                                 images.remove(images[i]);
                                               });
+                                              reloadProvider(dataList);
                                             },
                                             child: Card(
                                               elevation: 10,
@@ -233,6 +231,7 @@ class _CustomImageAddingFieldState
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           CustomButton(
+                            boderColor: Config.white,
                             radius: 4,
                             txtColor: Config.theme,
                             bgColor: Config.bg,
@@ -286,6 +285,7 @@ class _CustomImageAddingFieldState
                             lable: "Gallary",
                           ),
                           CustomButton(
+                            boderColor: Config.white,
                             radius: 4,
                             txtColor: Config.theme,
                             bgColor: Config.bg,
@@ -350,6 +350,7 @@ class _CustomImageAddingFieldState
                 height: 10,
               ),
               CustomButton(
+                boderColor: Config.white,
                 radius: 4,
                 txtColor: Config.white,
                 bgColor: Config.theme,

@@ -139,6 +139,7 @@ class _CustomImageButtonState extends ConsumerState<CustomImageButton> {
                       maxLines: 5,
                     ),
                     CustomButton(
+                      boderColor: Config.white,
                       radius: 4,
                       txtColor: Config.white,
                       bgColor: Config.theme,
@@ -289,15 +290,19 @@ class _CustomImageButtonState extends ConsumerState<CustomImageButton> {
         if (widget.btnType == "status") return statusFunction();
         if (widget.btnType == "image") return imageFunction();
       },
-      child: Container(
-        width: widget.height * 0.04,
-        height: widget.height * 0.04,
-        decoration: BoxDecoration(
-          color: widget.btnType == "status" ? isColor() : widget.bg_color,
-          borderRadius: BorderRadius.circular(4),
+      child: Card(
+        elevation: 5,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
+        child: Container(
+          width: widget.height * 0.04,
+          height: widget.height * 0.04,
+          decoration: BoxDecoration(
+            color: widget.btnType == "status" ? isColor() : widget.bg_color,
+            borderRadius: BorderRadius.circular(100),
+          ),
+          child:
+              widget.btnType == "status" ? isStatus() : Image.asset(widget.img),
         ),
-        child:
-            widget.btnType == "status" ? isStatus() : Image.asset(widget.img),
       ),
     );
   }

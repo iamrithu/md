@@ -1,8 +1,10 @@
 // ignore_for_file: sort_child_properties_last, prefer_const_literals_to_create_immutables, prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:md/config/config.dart';
+import 'package:md/provider/provider.dart';
 import 'package:md/screen/check-screen/vehicleCheck/vehicleCheckScreen.dart';
 import 'package:md/screen/check-screen/visualCheck/visualCheckScreen.dart';
 import 'package:md/screen/report-screen/reportScreen.dart';
@@ -12,14 +14,25 @@ import '../../../widgets/customImageButton.dart';
 import '../../../widgets/globalButtonWidget.dart';
 import '../../summary-screen.dart/summaryScreen.dart';
 
-class CabinScreen extends StatefulWidget {
+class CabinScreen extends ConsumerStatefulWidget {
   const CabinScreen({Key? key}) : super(key: key);
 
   @override
   _CabinScreenState createState() => _CabinScreenState();
 }
 
-class _CabinScreenState extends State<CabinScreen> {
+class _CabinScreenState extends ConsumerState<CabinScreen> {
+  List<Map<String, dynamic>> cabin_check = [];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    setState(() {
+      cabin_check = ref.read(cabinProvider);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -100,86 +113,38 @@ class _CabinScreenState extends State<CabinScreen> {
                       SizedBox(
                         height: 20,
                       ),
-                      CustomCheckDetailScreen(
-                        width: width,
-                        height: height,
-                        lable: "Steering",
-                        type: "Cabin Checks",
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      CustomCheckDetailScreen(
-                        width: width,
-                        height: height,
-                        lable: "Wipers",
-                        type: "Cabin Checks",
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      CustomCheckDetailScreen(
-                        width: width,
-                        height: height,
-                        lable: "Washers",
-                        type: "Cabin Checks",
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      CustomCheckDetailScreen(
-                        width: width,
-                        height: height,
-                        lable: "Horn",
-                        type: "Cabin Checks",
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      CustomCheckDetailScreen(
-                        width: width,
-                        height: height,
-                        lable: "Brakes inc. ABS / EBS",
-                        type: "Cabin Checks",
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      CustomCheckDetailScreen(
-                        width: width,
-                        height: height,
-                        lable: "Mirrors / Glass / Visibility",
-                        type: "Cabin Checks",
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      CustomCheckDetailScreen(
-                        width: width,
-                        height: height,
-                        lable: "Truck Interior / Seat Belts",
-                        type: "Cabin Checks",
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      CustomCheckDetailScreen(
-                        width: width,
-                        height: height,
-                        lable: "Warning Lamps / MIL",
-                        type: "Cabin Checks",
-                      ),
+                      for (var i = 0; i < cabin_check.length; i++)
+                        CustomCheckDetailScreen(
+                          width: width,
+                          height: height,
+                          lable: cabin_check[i]["name"],
+                          type: cabin_check[i]["type"],
+                        ),
                       Expanded(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.end,
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             CustomButton(
+                              boderColor: Config.white,
                               radius: 4,
                               txtColor: Config.white,
                               width: width,
                               height: height,
                               click: () {
+                                for (var i = 0; i < cabin_check.length; i++) {
+                                  if (cabin_check[i]["image"].isEmpty) {
+                                    customAlert(
+                                        context: context,
+                                        height: height,
+                                        width: width,
+                                        content: "Kindly add images for ",
+                                        success: false,
+                                        content2:
+                                            " ${cabin_check[i]["type"]}/${cabin_check[i]["name"]}");
+                                    return;
+                                  }
+                                }
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (context) => SummaryScreen(),

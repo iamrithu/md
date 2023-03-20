@@ -22,76 +22,6 @@ class SummaryScreen extends ConsumerStatefulWidget {
 }
 
 class _SummaryScreenState extends ConsumerState<SummaryScreen> {
-  List<Map<String, dynamic>> visualCheck = [
-    {
-      "name": "Front",
-      "status": true,
-    },
-    {
-      "name": "Near side",
-      "status": true,
-    },
-    {
-      "name": "Rear",
-      "status": true,
-    },
-    {
-      "name": "Off-side",
-      "status": true,
-    },
-  ];
-  List<Map<String, dynamic>> vehicleCheck = [
-    {
-      "name": "Adblue levels",
-      "status": true,
-    },
-    {
-      "name": "Fuel/Oil Leaks",
-      "status": true,
-    },
-    {
-      "name": "Lights",
-      "status": true,
-    },
-    {
-      "name": "Indicators / Signals",
-      "status": true,
-    },
-  ];
-  List<Map<String, dynamic>> cabinCheck = [
-    {
-      "name": "Steering",
-      "status": true,
-    },
-    {
-      "name": "Wipers",
-      "status": true,
-    },
-    {
-      "name": "Washers",
-      "status": true,
-    },
-    {
-      "name": "Horn",
-      "status": true,
-    },
-    {
-      "name": "Brakes inc. ABS / EBS",
-      "status": true,
-    },
-    {
-      "name": "Mirrors / Glass / Visibility",
-      "status": true,
-    },
-    {
-      "name": "Truck Interior / Seat Belts",
-      "status": true,
-    },
-    {
-      "name": "Warning Lamps / MIL",
-      "status": true,
-    },
-  ];
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -235,7 +165,7 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                               "Visual Check",
                               style: GoogleFonts.mulish(
                                 textStyle: TextStyle(
-                                    color: Config.black,
+                                    color: Config.theme,
                                     fontSize: width / 30,
                                     fontWeight: FontWeight.bold),
                               ),
@@ -300,7 +230,7 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                               "Vehicle Check",
                               style: GoogleFonts.mulish(
                                 textStyle: TextStyle(
-                                    color: Config.black,
+                                    color: Config.theme,
                                     fontSize: width / 30,
                                     fontWeight: FontWeight.bold),
                               ),
@@ -366,7 +296,7 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                               "Cabin Check",
                               style: GoogleFonts.mulish(
                                 textStyle: TextStyle(
-                                    color: Config.black,
+                                    color: Config.theme,
                                     fontSize: width / 30,
                                     fontWeight: FontWeight.bold),
                               ),
@@ -433,6 +363,7 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       CustomButton(
+                        boderColor: Config.white,
                         radius: 4,
                         txtColor: Config.white,
                         width: width,

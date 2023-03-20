@@ -1,46 +1,51 @@
 // ignore_for_file: sort_child_properties_last, prefer_const_literals_to_create_immutables, prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:md/config/config.dart';
 import 'package:md/screen/report-screen/reportScreen.dart';
 
+import '../../../provider/provider.dart';
 import '../../../widgets/customCheckDetailField.dart';
 import '../../../widgets/customImageButton.dart';
 import '../../../widgets/globalButtonWidget.dart';
 import '../vehicleCheck/vehicleCheckScreen.dart';
 
-class VisualCheckScreen extends StatefulWidget {
+class VisualCheckScreen extends ConsumerStatefulWidget {
   const VisualCheckScreen({Key? key}) : super(key: key);
 
   @override
   _VisualCheckScreenState createState() => _VisualCheckScreenState();
 }
 
-class _VisualCheckScreenState extends State<VisualCheckScreen> {
-  List<Map<String, dynamic>> visual_check = [
-    {
-      "name": "Front",
-      "type": "visual_check",
-    },
-    {
-      "name": "Near side",
-      "type": "visual_check",
-    },
-    {
-      "name": "Rear",
-      "type": "visual_check",
-    },
-    {
-      "name": "Off-side",
-      "type": "visual_check",
-    }
-  ];
-
+class _VisualCheckScreenState extends ConsumerState<VisualCheckScreen> {
+  // List<Map<String, dynamic>> visual_check = [
+  //   {
+  //     "name": "Front",
+  //     "type": "visual_check",
+  //   },
+  //   {
+  //     "name": "Near side",
+  //     "type": "visual_check",
+  //   },
+  //   {
+  //     "name": "Rear",
+  //     "type": "visual_check",
+  //   },
+  //   {
+  //     "name": "Off-side",
+  //     "type": "visual_check",
+  //   }
+  // ];
+  List<Map<String, dynamic>> visual_check = [];
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    setState(() {
+      visual_check = ref.read(visualProvider);
+    });
   }
 
   @override
@@ -110,7 +115,7 @@ class _VisualCheckScreenState extends State<VisualCheckScreen> {
                       Row(
                         children: [
                           Text(
-                            "Visual Damager",
+                            "Visual Check",
                             style: GoogleFonts.mulish(
                               textStyle: TextStyle(
                                   color: Config.black,
@@ -136,11 +141,25 @@ class _VisualCheckScreenState extends State<VisualCheckScreen> {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             CustomButton(
+                              boderColor: Config.white,
                               radius: 4,
                               txtColor: Config.white,
                               width: width,
                               height: height,
                               click: () {
+                                for (var i = 0; i < visual_check.length; i++) {
+                                  if (visual_check[i]["image"].isEmpty) {
+                                    customAlert(
+                                        context: context,
+                                        height: height,
+                                        width: width,
+                                        content: "Kindly add images for ",
+                                        success: false,
+                                        content2:
+                                            " ${visual_check[i]["type"]}/${visual_check[i]["name"]}");
+                                    return;
+                                  }
+                                }
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (context) => VehicleScreen(),

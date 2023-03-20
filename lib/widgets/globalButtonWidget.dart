@@ -13,13 +13,16 @@ class CustomButton extends StatefulWidget {
     required this.bgColor,
     required this.txtColor,
     required this.radius,
+    required this.boderColor,
   });
 
   final double width;
   final double height;
   final String lable;
-  final Function click;
+  final Function? click;
   final Color bgColor;
+  final Color boderColor;
+
   final Color txtColor;
   final double radius;
 
@@ -34,12 +37,15 @@ class _CustomButtonState extends State<CustomButton> {
     double width = MediaQuery.of(context).size.width;
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-          backgroundColor: widget.bgColor,
-          fixedSize: Size(widget.width, widget.height * 0.06),
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(widget.radius))),
+        backgroundColor: widget.bgColor,
+        fixedSize: Size(widget.width, widget.height * 0.06),
+        shape: RoundedRectangleBorder(
+          side: BorderSide(color: widget.boderColor, width: 2),
+          borderRadius: BorderRadius.circular(1000),
+        ),
+      ),
       onPressed: () {
-        widget.click();
+        widget.click!();
       },
       child: Text(
         widget.lable,

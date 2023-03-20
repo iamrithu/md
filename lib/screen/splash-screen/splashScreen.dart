@@ -22,13 +22,6 @@ class _SplashScreenState extends State<SplashScreen> {
         isAnimated = true;
       });
     });
-    Future.delayed(Duration(milliseconds: 3000), () {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => Login(),
-        ),
-      );
-    });
   }
 
   @override
@@ -36,33 +29,31 @@ class _SplashScreenState extends State<SplashScreen> {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
 
-    return Scaffold(
-      backgroundColor: Config.bg,
-      body: Container(
-        width: width,
-        height: height,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Card(
-              elevation: 10,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  side: const BorderSide(color: Config.theme)),
-              child: AnimatedContainer(
-                width: isAnimated ? width * 0.4 : 0,
-                height: isAnimated ? height * 0.1 : 0,
-                duration: const Duration(seconds: 1),
-                child: Center(
-                    child: Image.asset(
-                  "assets/logo.png",
-                  scale: 1.5,
-                )),
-              ),
+    return Container(
+      color: Config.bg,
+      width: width,
+      height: height,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Card(
+            elevation: 10,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+                side: const BorderSide(color: Config.theme)),
+            child: AnimatedContainer(
+              width: isAnimated ? width * 0.4 : 0,
+              height: isAnimated ? height * 0.1 : 0,
+              duration: const Duration(seconds: 1),
+              child: Center(
+                  child: Image.asset(
+                "assets/logo.png",
+                scale: 1.5,
+              )),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

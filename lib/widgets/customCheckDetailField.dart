@@ -69,7 +69,9 @@ class _CustomCheckDetailScreenState
       try {
         Map<String, dynamic> object =
             dataList.firstWhere((e) => e["name"] == widget.lable);
-
+        if (object["image"].isEmpty) {
+          return false;
+        }
         return true;
       } catch (e) {
         return false;
@@ -107,7 +109,7 @@ class _CustomCheckDetailScreenState
       height: widget.height * 0.06,
       decoration: BoxDecoration(
           color: Config.white,
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(100),
           border: Border.all(
               color: isAdded()
                   ? Color.fromARGB(255, 184, 251, 199)

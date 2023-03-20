@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../config/config.dart';
@@ -45,8 +46,15 @@ class _CustomTextFormState extends State<CustomTextForm> {
           height: 10,
         ),
         TextFormField(
+          onTapOutside: (value) {
+            SystemChannels.textInput.invokeMethod('TextInput.hide');
+          },
           controller: widget.controller,
-          keyboardType: TextInputType.emailAddress,
+          keyboardType: widget.lable == "Password"
+              ? TextInputType.visiblePassword
+              : widget.lable == "Phone Number of Witness"
+                  ? TextInputType.phone
+                  : TextInputType.text,
           obscureText: widget.hide,
           style: TextStyle(fontWeight: FontWeight.normal, color: Colors.black),
           decoration: InputDecoration(
@@ -62,7 +70,8 @@ class _CustomTextFormState extends State<CustomTextForm> {
               borderRadius: BorderRadius.circular(4),
             ),
           ),
-          minLines: 1,
+          // minLines: widget.lable == "Brief Statement" ? 3 : 1,
+          maxLines: widget.lable == "Brief Statement" ? 5 : 1,
         )
       ],
     );
