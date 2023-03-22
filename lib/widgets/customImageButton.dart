@@ -285,7 +285,7 @@ class _CustomImageButtonState extends ConsumerState<CustomImageButton> {
           dataList = ref.watch(cabinProvider);
         }
 
-        if (widget.btnType == "others") return;
+        if (widget.btnType == "others") return widget.click();
         if (widget.btnType == "comments") return commentFunction();
         if (widget.btnType == "status") return statusFunction();
         if (widget.btnType == "image") return imageFunction();

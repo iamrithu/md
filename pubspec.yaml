@@ -42,6 +42,11 @@ dependencies:
   image_picker: ^0.8.7
   intl: ^0.18.0
   dio: ^5.0.3
+  shared_preferences: ^2.0.18
+  geolocator: ^9.0.2
+  geocoding: ^2.1.0
+  syncfusion_flutter_pdf: ^20.4.54
+  path_provider: ^2.0.14
 dev_dependencies:
   flutter_test:
     sdk: flutter

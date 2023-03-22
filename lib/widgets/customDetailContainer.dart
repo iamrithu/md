@@ -91,6 +91,7 @@ class _CustomDetailContainerState extends ConsumerState<CustomDetailContainer> {
                               bottom: BorderSide(color: Config.underLine))),
                       child: widget.isText
                           ? TextFormField(
+                              initialValue: ref.watch(milage),
                               onTapOutside: (value) {
                                 SystemChannels.textInput
                                     .invokeMethod('TextInput.hide');

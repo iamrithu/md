@@ -129,93 +129,87 @@ class _CustomImageAddingFieldState
                         child: ListView(
                       children: [
                         if (images.isEmpty)
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Wrap(
-                                children: [
-                                  Text(
-                                    "Kindly add one or more images..",
-                                    style: GoogleFonts.mulish(
-                                      textStyle: TextStyle(
-                                          color:
-                                              Color.fromARGB(255, 246, 92, 105),
-                                          fontSize: width / 40,
-                                          fontWeight: FontWeight.bold),
-                                    ),
+                          Container(
+                            height: height * 0.7,
+                            alignment: Alignment.center,
+                            child: Wrap(
+                              children: [
+                                Text(
+                                  "Kindly add one or more images..",
+                                  style: GoogleFonts.mulish(
+                                    textStyle: TextStyle(
+                                        color:
+                                            Color.fromARGB(255, 246, 92, 105),
+                                        fontSize: width / 40,
+                                        fontWeight: FontWeight.bold),
                                   ),
-                                ],
-                              ),
-                            ],
+                                ),
+                              ],
+                            ),
                           ),
                         if (images.isNotEmpty)
                           for (var i = 0; i < images.length; i++)
-                            InkWell(
-                              onTap: () {},
-                              child: Container(
-                                width: width,
-                                height: height * 0.17,
-                                margin: EdgeInsets.only(bottom: 10),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(color: Config.white),
-                                ),
-                                child: Stack(
-                                  children: [
-                                    Container(
-                                      width: width,
-                                      height: height * 0.17,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        border: Border.all(color: Config.white),
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(10),
-                                        child: Image.file(
-                                          images[i],
-                                          fit: BoxFit.cover,
-                                        ),
+                            Container(
+                              width: width,
+                              height: height * 0.17,
+                              margin: EdgeInsets.only(bottom: 10),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: Config.white),
+                              ),
+                              child: Stack(
+                                children: [
+                                  Container(
+                                    width: width,
+                                    height: height * 0.17,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      border: Border.all(color: Config.white),
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: Image.file(
+                                        images[i],
+                                        fit: BoxFit.cover,
                                       ),
                                     ),
-                                    Container(
-                                      width: width,
-                                      height: height * 0.17,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        border: Border.all(color: Config.white),
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          InkWell(
-                                            onTap: () {
-                                              setState(() {
-                                                images.remove(images[i]);
-                                              });
-                                              reloadProvider(dataList);
-                                            },
-                                            child: Card(
-                                              elevation: 10,
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(5.0),
-                                                child: Icon(
-                                                  Icons.delete,
-                                                  color: Config.theme,
-                                                  size: width / 30,
-                                                ),
+                                  ),
+                                  Container(
+                                    width: width,
+                                    height: height * 0.17,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      border: Border.all(color: Config.white),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        InkWell(
+                                          onTap: () {
+                                            setState(() {
+                                              images.remove(images[i]);
+                                            });
+                                            reloadProvider(dataList);
+                                          },
+                                          child: Card(
+                                            elevation: 10,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(5.0),
+                                              child: Icon(
+                                                Icons.delete,
+                                                color: Config.theme,
+                                                size: width / 30,
                                               ),
                                             ),
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ),
                       ],
@@ -298,7 +292,12 @@ class _CustomImageAddingFieldState
                                     preferredCameraDevice: CameraDevice.rear);
 
                                 if (image == null)
-                                  return print("your camera image is null");
+                                  return customAlert(
+                                      context: context,
+                                      height: height,
+                                      width: width,
+                                      content: "your camera image is null",
+                                      success: false);
                                 ;
                                 File imageTemporay = File(image.path);
 

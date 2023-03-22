@@ -1,16 +1,17 @@
 // ignore_for_file: sort_child_properties_last, prefer_const_literals_to_create_immutables, prefer_const_constructors
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:md/config/config.dart';
 import 'package:md/provider/provider.dart';
-import 'package:md/screen/check-screen/cabinCheck/cabilCheckScreen.dart';
-import 'package:md/screen/check-screen/visualCheck/visualCheckScreen.dart';
 import 'package:md/screen/driver-screen/driverScreen.dart';
-import 'package:md/screen/report-screen/reportScreen.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:syncfusion_flutter_pdf/pdf.dart';
 
-import '../../../widgets/customCheckDetailField.dart';
 import '../../../widgets/customImageButton.dart';
 import '../../../widgets/globalButtonWidget.dart';
 
@@ -26,6 +27,25 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
+
+    printPdf() async {
+      // Create a new PDF document.
+      final PdfDocument document = PdfDocument();
+      final Directory? downloadsDir = await getApplicationSupportDirectory();
+      final path = downloadsDir!.path;
+
+// Add a PDF page and draw text.
+      document.pages.add().graphics.drawString(
+          'Hello World!', PdfStandardFont(PdfFontFamily.helvetica, 12),
+          brush: PdfSolidBrush(PdfColor(0, 0, 0)),
+          bounds: const Rect.fromLTWH(0, 0, 150, 20));
+// Save the document.
+      File('${path}/${DateFormat("ddMMyyyyhhmmss").format(DateTime.now())}')
+          .writeAsBytes(await document.save());
+// Dispose the document.
+      document.dispose();
+    }
+
     return SafeArea(
       child: Scaffold(
         backgroundColor: Config.bg,
@@ -45,9 +65,20 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                     InkWell(
                       splashColor: Config.white,
                       onTap: () {
+                        ref.refresh(milage);
+                        ref.refresh(visualProvider);
+                        ref.refresh(vehicleDetailProvider);
+                        ref.refresh(cabinProvider);
+                        customAlert(
+                          context: context,
+                          height: height,
+                          width: width,
+                          content: "Previous Inspection Saved ....",
+                          success: true,
+                        );
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) => CabinScreen(),
+                            builder: (context) => DriverScreen(),
                           ),
                         );
                       },
@@ -136,7 +167,9 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                                     type: null,
                                     lable: null,
                                     height: height,
-                                    click: () {},
+                                    click: () {
+                                      printPdf();
+                                    },
                                     bg_color: Config.theme,
                                     img: "assets/printer.png",
                                   ),
@@ -248,6 +281,9 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                                   i < ref.watch(vehicleProvider).length;
                                   i++)
                                 TableRow(
+                                  decoration: BoxDecoration(
+                                    color: Config.white,
+                                  ),
                                   children: [
                                     Container(
                                       color: Config.white,
@@ -263,6 +299,28 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                                         ),
                                       ),
                                     ),
+                                    // Container(
+                                    //   color: Config.white,
+                                    //   padding: const EdgeInsets.all(10),
+                                    //   child: Center(
+                                    //     child: CustomImageButton(
+                                    //       btnType: "comments",
+                                    //       type: "",
+                                    //       lable: "",
+                                    //       height: height,
+                                    //       click: () {},
+                                    //       bg_color:
+                                    //           ref.watch(vehicleProvider)[i]
+                                    //                   ["status"]
+                                    //               ? Config.bgSuc
+                                    //               : Config.bgFail,
+                                    //       img: ref.watch(cabinProvider)[i]
+                                    //               ["status"]
+                                    //           ? "assets/correct.png"
+                                    //           : "assets/wrong.png",
+                                    //     ),
+                                    //   ),
+                                    // ),
                                     Container(
                                       color: Config.white,
                                       padding: const EdgeInsets.all(10),
@@ -369,9 +427,20 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                         width: width,
                         height: height,
                         click: () {
+                          ref.refresh(milage);
+                          ref.refresh(visualProvider);
+                          ref.refresh(vehicleProvider);
+                          ref.refresh(cabinProvider);
+                          customAlert(
+                            context: context,
+                            height: height,
+                            width: width,
+                            content: "Previous Inspection Saved ....",
+                            success: true,
+                          );
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) => CabinScreen(),
+                              builder: (context) => DriverScreen(),
                             ),
                           );
                         },

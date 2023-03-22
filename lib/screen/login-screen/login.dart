@@ -8,6 +8,7 @@ import 'package:md/screen/driver-screen/driverScreen.dart';
 import 'package:md/screen/login-screen/widget/customTextForm.dart';
 import 'package:md/screen/splash-screen/splashScreen.dart';
 import 'package:md/widgets/globalButtonWidget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../api/api.dart';
 import '../../provider/provider.dart';
@@ -26,11 +27,50 @@ class _LoginState extends ConsumerState<Login> {
   bool isRememberMe = false;
   bool isLoading = false;
 
+  getLocal() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final bool? remember = prefs.getBool('remember');
+    final String? email = prefs.getString('email');
+    final String? password = prefs.getString('password');
+
+    if (remember != false && remember != null) {
+      Api().Login(email!, password!).then((value) {
+        if (value.statusCode == 200) {
+          ref.read(userProvider.notifier).update(
+                (state) => [],
+              );
+          ref.read(vehicleDetailProvider.notifier).update(
+                (state) => [],
+              );
+          ref.read(assignDetailProvider.notifier).update(
+                (state) => [],
+              );
+          ref.read(userProvider.notifier).update(
+                (state) => value.data["user"],
+              );
+          ref.read(vehicleDetailProvider.notifier).update(
+                (state) => value.data["vehicle"],
+              );
+          ref.read(assignDetailProvider.notifier).update(
+                (state) => value.data["assign"],
+              );
+          ref.read(token.notifier).update(
+                (state) => value.data["0"]["token"],
+              );
+
+          ref.read(isLogedIn.notifier).state = true;
+        }
+      });
+    }
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    Future.delayed(Duration(seconds: 3), () {
+    getLocal();
+    Future.delayed(Duration(seconds: 3), () async {
       return ref.read(splashScreen.notifier).update((state) => false);
     });
   }
@@ -46,6 +86,13 @@ class _LoginState extends ConsumerState<Login> {
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
+
+    localStore(bool remember, String? email, String? password) async {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('remember', remember);
+      await prefs.setString('email', email!);
+      await prefs.setString('password', password!);
+    }
 
     login() {
       if (_emailController.text.trim().isEmpty ||
@@ -70,11 +117,16 @@ class _LoginState extends ConsumerState<Login> {
         isLoading = true;
       });
 
+      if (isRememberMe) {
+        localStore(
+            isRememberMe, _emailController.text, _passwordController.text);
+      } else {
+        localStore(isRememberMe, "", "");
+      }
       Api()
           .Login(_emailController.text, _passwordController.text)
           .then((value) {
         if (value.statusCode == 200) {
-          print(value.data.toString());
           ref.read(userProvider.notifier).update(
                 (state) => [],
               );
@@ -96,11 +148,15 @@ class _LoginState extends ConsumerState<Login> {
           ref.read(token.notifier).update(
                 (state) => value.data["0"]["token"],
               );
-
           ref.read(isLogedIn.notifier).state = true;
           setState(() {
             isLoading = false;
           });
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => DriverScreen(),
+            ),
+          );
           return customAlert(
             context: context,
             height: height,
@@ -121,12 +177,6 @@ class _LoginState extends ConsumerState<Login> {
           );
         }
       });
-
-      // Navigator.of(context).push(
-      //   MaterialPageRoute(
-      //     builder: (context) => DriverScreen(),
-      //   ),
-      // );
     }
 
     return Scaffold(

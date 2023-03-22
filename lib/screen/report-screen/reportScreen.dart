@@ -178,6 +178,16 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
                               width: width,
                               height: height,
                               click: () {
+                                if (ref.watch(milage).isEmpty) {
+                                  return customAlert(
+                                      context: context,
+                                      height: height,
+                                      width: width,
+                                      content: "Please Enter Mileage Values",
+                                      success: false);
+                                }
+                                ref.read(reportNo.notifier).update((state) =>
+                                    "${data["number_plate"]}-${DateFormat("ddMMyyyy-hhmmss").format(DateTime.now())}");
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (context) => VisualCheckScreen(),
