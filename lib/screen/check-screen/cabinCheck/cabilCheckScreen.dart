@@ -5,13 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:md/config/config.dart';
 import 'package:md/provider/provider.dart';
-import 'package:md/screen/check-screen/vehicleCheck/vehicleCheckScreen.dart';
-import 'package:md/screen/check-screen/visualCheck/visualCheckScreen.dart';
-import 'package:md/screen/report-screen/reportScreen.dart';
 
 import '../../../api/api.dart';
 import '../../../widgets/customCheckDetailField.dart';
-import '../../../widgets/customImageButton.dart';
 import '../../../widgets/globalButtonWidget.dart';
 import '../../summary-screen.dart/summaryScreen.dart';
 
@@ -41,6 +37,18 @@ class _CabinScreenState extends ConsumerState<CabinScreen> {
     double width = MediaQuery.of(context).size.width;
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Config.theme,
+          leading: InkWell(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Icon(
+              Icons.arrow_back_ios,
+              color: Config.white,
+            ),
+          ),
+        ),
         backgroundColor: Config.bg,
         body: Stack(
           children: [
@@ -49,53 +57,6 @@ class _CabinScreenState extends ConsumerState<CabinScreen> {
               height: height,
               child: Column(
                 children: [
-                  Container(
-                    color: Config.theme,
-                    width: width,
-                    height: height * 0.07,
-                    alignment: Alignment.centerLeft,
-                    child: Row(
-                      children: [
-                        InkWell(
-                          splashColor: Config.white,
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => VehicleScreen(),
-                              ),
-                            );
-                          },
-                          child: SizedBox(
-                            height: height * 0.05,
-                            child: Row(
-                              children: [
-                                SizedBox(
-                                  width: 20,
-                                ),
-                                Icon(
-                                  Icons.arrow_back_ios,
-                                  color: Config.white,
-                                  size: width / 30,
-                                ),
-                                SizedBox(
-                                  width: 10,
-                                ),
-                                Text(
-                                  "Back",
-                                  style: GoogleFonts.mulish(
-                                    textStyle: TextStyle(
-                                        color: Config.white,
-                                        fontSize: width / 30,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.all(15),
@@ -136,96 +97,145 @@ class _CabinScreenState extends ConsumerState<CabinScreen> {
                                   width: width,
                                   height: height,
                                   click: () {
-                                    // for (var i = 0;
-                                    //     i < cabin_check.length;
-                                    //     i++) {
-                                    //   if (cabin_check[i]["image"].isEmpty) {
-                                    //     customAlert(
-                                    //         context: context,
-                                    //         height: height,
-                                    //         width: width,
-                                    //         content: "Kindly add images for ",
-                                    //         success: false,
-                                    //         content2:
-                                    //             " ${cabin_check[i]["type"]}/${cabin_check[i]["name"]}");
-                                    //     return;
-                                    //   }
-                                    // }
+                                    Map<String, dynamic> object = {
+                                      "reportno": ref.watch(reportNo),
+                                      "mileage": ref.watch(milage)
+                                    };
+                                    setState(() {
+                                      isLoading = true;
+                                      message = "Generate Inspection";
+                                    });
 
-                                    // Map<String, dynamic> object = {
-                                    //   "reportno": ref.watch(reportNo),
-                                    //   "mileage": ref.watch(milage)
-                                    // };
-                                    // setState(() {
-                                    //   isLoading = true;
-                                    //   message = "Generate Inspection";
-                                    // });
+                                    Api()
+                                        .inspection(
+                                            ref.watch(token),
+                                            ref.watch(assignDetailProvider)[0]
+                                                ["id"],
+                                            object)
+                                        .then((value) {
+                                      ref.read(inspectionId.notifier).update(
+                                          (state) => value.data["data"]["id"]);
+                                      if (value.statusCode == 200) {
+                                        setState(() {
+                                          message = "Visual Checking......";
+                                        });
+                                        Api()
+                                            .check(
+                                                ref.watch(token),
+                                                "visual",
+                                                ref.watch(visualProvider),
+                                                value.data["data"]["id"])
+                                            .then((value) {
+                                          if (value.statusCode == 200) {
+                                            setState(() {
+                                              message =
+                                                  "Vehicle Checking......";
+                                            });
+                                          } else {
+                                            setState(() {
+                                              isLoading = false;
+                                              message = "";
+                                            });
+                                            customAlert(
+                                              context: context,
+                                              height: height,
+                                              width: width,
+                                              content:
+                                                  "Something went wrong on visual check ",
+                                              success: false,
+                                            );
+                                            return null;
+                                          }
+                                        });
 
-                                    // Api()
-                                    //     .inspection(
-                                    //         ref.watch(token),
-                                    //         ref.watch(assignDetailProvider)[0]
-                                    //             ["id"],
-                                    //         object)
-                                    //     .then((value) {
-                                    //   if (value.statusCode == 200) {
-                                    //     setState(() {
-                                    //       message = "Generate Visual Check";
-                                    //     });
+                                        Api()
+                                            .check(
+                                                ref.watch(token),
+                                                "vehicle",
+                                                ref.watch(vehicleProvider),
+                                                value.data["data"]["id"])
+                                            .then((value) {
+                                          if (value.statusCode == 200) {
+                                            setState(() {
+                                              message = "Cabin Checking......";
+                                            });
+                                          } else {
+                                            setState(() {
+                                              isLoading = false;
+                                              message = "";
+                                            });
+                                            return customAlert(
+                                              context: context,
+                                              height: height,
+                                              width: width,
+                                              content:
+                                                  "Something went wrong on vehicle check ",
+                                              success: false,
+                                            );
+                                          }
+                                        });
 
-                                    //     Api().check(
-                                    //         ref.watch(token),
-                                    //         "visual",
-                                    //         ref.watch(visualProvider),
-                                    //         value.data["data"]["id"]);
+                                        Api()
+                                            .check(
+                                                ref.watch(token),
+                                                "cabin",
+                                                ref.watch(cabinProvider),
+                                                value.data["data"]["id"])
+                                            .then((value) {
+                                          if (value.statusCode == 200) {
+                                            setState(() {
+                                              message =
+                                                  "Generate Summary......";
+                                            });
 
-                                    //     Api().check(
-                                    //         ref.watch(token),
-                                    //         "vehicle",
-                                    //         ref.watch(vehicleProvider),
-                                    //         value.data["data"]["id"]);
-
-                                    //     Api().check(
-                                    //         ref.watch(token),
-                                    //         "cabin",
-                                    //         ref.watch(cabinProvider),
-                                    //         value.data["data"]["id"]);
-                                    //   } else {
-                                    //     setState(() {
-                                    //       isLoading = false;
-                                    //       message = "";
-                                    //     });
-                                    //     customAlert(
-                                    //       context: context,
-                                    //       height: height,
-                                    //       width: width,
-                                    //       content: "Something Went Wrong",
-                                    //       success: false,
-                                    //     );
-                                    //   }
-                                    //   setState(() {
-                                    //     isLoading = false;
-                                    //     message = "";
-                                    //   });
-                                    //   customAlert(
-                                    //     context: context,
-                                    //     height: height,
-                                    //     width: width,
-                                    //     content: "Data Stored Successfully",
-                                    //     success: true,
-                                    //   );
-                                    //   Navigator.of(context).push(
-                                    //     MaterialPageRoute(
-                                    //       builder: (context) => SummaryScreen(),
-                                    //     ),
-                                    //   );
-                                    //   return;
-                                    // });
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder: (context) => SummaryScreen(),
-                                      ),
-                                    );
+                                            customAlert(
+                                              context: context,
+                                              height: height,
+                                              width: width,
+                                              content:
+                                                  "Data Stored Successfully",
+                                              success: true,
+                                            );
+                                            setState(() {
+                                              isLoading = false;
+                                              message = "";
+                                            });
+                                            Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    SummaryScreen(),
+                                              ),
+                                            );
+                                            return;
+                                          } else {
+                                            setState(() {
+                                              isLoading = false;
+                                              message = "";
+                                            });
+                                            return customAlert(
+                                              context: context,
+                                              height: height,
+                                              width: width,
+                                              content:
+                                                  "Something went wrong on cabin check ",
+                                              success: false,
+                                            );
+                                          }
+                                        });
+                                      } else {
+                                        setState(() {
+                                          isLoading = false;
+                                          message = "";
+                                        });
+                                        customAlert(
+                                          context: context,
+                                          height: height,
+                                          width: width,
+                                          content: "Something Went Wrong",
+                                          success: false,
+                                        );
+                                      }
+                                    });
                                   },
                                   bgColor: Config.theme,
                                   lable: "Submit",

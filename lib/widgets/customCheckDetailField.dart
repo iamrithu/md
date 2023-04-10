@@ -129,7 +129,7 @@ class _CustomCheckDetailScreenState
             ),
           ),
           Container(
-            width: widget.width * 0.3,
+            width: widget.width * 0.4,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.center,

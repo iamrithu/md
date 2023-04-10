@@ -47,33 +47,40 @@ class _DriverScreenState extends ConsumerState<DriverScreen> {
                       onTap: () {
                         SystemNavigator.pop();
                       },
-                      child: SizedBox(
-                        height: height * 0.05,
-                        child: Row(
-                          children: [
-                            SizedBox(
-                              width: 20,
-                            ),
-                            Icon(
-                              Icons.arrow_back_ios,
-                              color: Config.white,
-                              size: width / 30,
-                            ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            Text(
-                              "Back",
-                              style: GoogleFonts.mulish(
-                                textStyle: TextStyle(
-                                    color: Config.white,
-                                    fontSize: width / 30,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ],
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20.0),
+                        child: Icon(
+                          Icons.arrow_back_ios,
+                          color: Config.white,
                         ),
                       ),
+                      // child: SizedBox(
+                      //   height: height * 0.05,
+                      //   child: Row(
+                      //     children: [
+                      //       SizedBox(
+                      //         width: 20,
+                      //       ),
+                      //       Icon(
+                      //         Icons.arrow_back_ios,
+                      //         color: Config.white,
+                      //         size: width / 30,
+                      //       ),
+                      //       SizedBox(
+                      //         width: 10,
+                      //       ),
+                      //       Text(
+                      //         "Back",
+                      //         style: GoogleFonts.mulish(
+                      //           textStyle: TextStyle(
+                      //               color: Config.white,
+                      //               fontSize: width / 30,
+                      //               fontWeight: FontWeight.bold),
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
                     ),
                     InkWell(
                       splashColor: Config.white,
@@ -85,16 +92,13 @@ class _DriverScreenState extends ConsumerState<DriverScreen> {
                         await prefs.setString('email', "");
 
                         await prefs.setString('password', "");
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => Login(),
-                          ),
-                        );
-                        ref.refresh(userProvider);
-                        ref.refresh(assignDetailProvider);
-                        ref.refresh(vehicleDetailProvider);
+                        ref.refresh(milage);
+                        ref.refresh(incidentProvider);
+                        ref.refresh(visualProvider);
+                        ref.refresh(vehicleProvider);
+                        ref.refresh(cabinProvider);
                         ref.refresh(token);
-                        ref.refresh(reportNo);
+                        ref.refresh(isLogedIn);
                       },
                       child: SizedBox(
                         height: height * 0.05,
@@ -201,6 +205,17 @@ class _DriverScreenState extends ConsumerState<DriverScreen> {
                               width: width,
                               height: height,
                               click: () {
+                                if (ref.watch(vehicleDetailProvider)[0] ==
+                                    null) {
+                                  return customAlert(
+                                    context: context,
+                                    height: height,
+                                    width: width,
+                                    content:
+                                        "You are  not assigned  to any vehicle",
+                                    success: false,
+                                  );
+                                }
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (context) => ReportScreen(),

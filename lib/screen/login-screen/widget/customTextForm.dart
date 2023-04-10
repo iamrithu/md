@@ -56,7 +56,10 @@ class _CustomTextFormState extends State<CustomTextForm> {
                   ? TextInputType.phone
                   : TextInputType.text,
           obscureText: widget.hide,
-          style: TextStyle(fontWeight: FontWeight.normal, color: Colors.black),
+          style: TextStyle(
+              fontWeight: FontWeight.normal,
+              fontSize: widget.width / 32,
+              color: Config.lightText),
           decoration: InputDecoration(
             filled: true,
             fillColor: Config.white,
@@ -71,7 +74,7 @@ class _CustomTextFormState extends State<CustomTextForm> {
             ),
           ),
           // minLines: widget.lable == "Brief Statement" ? 3 : 1,
-          maxLines: widget.lable == "Brief Statement" ? 5 : 1,
+          maxLines: widget.lable == "Brief Statement" ? 3 : 1,
         )
       ],
     );

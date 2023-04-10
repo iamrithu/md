@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:dio/dio.dart';
-
 import '../config/config.dart';
 
 class Api {
@@ -14,6 +12,8 @@ class Api {
       contentType: ContentType.json.toString(),
     ),
   );
+
+//login api---
 
   Future Login(String email, String password) async {
     try {
@@ -30,6 +30,22 @@ class Api {
     }
   }
 
+  //generate pdf throug api
+
+  Future getPdf(int id) async {
+    try {
+      Response response = await dio.get(
+        "pdf/${id}",
+      );
+
+      return response;
+    } on DioError catch (e) {
+      return e.response;
+    }
+  }
+
+  //Add new inspection for vehicle check
+
   Future inspection(String token, int id, Map<String, dynamic> data) async {
     dio.options.headers["Authorization"] = "Bearer $token";
     try {
@@ -43,6 +59,7 @@ class Api {
     }
   }
 
+  // Add incident for if any happens
   Future incident(
       String token, int id, Map<String, dynamic> data, List<File> files) async {
     dio.options.headers["Authorization"] = "Bearer $token";
@@ -60,7 +77,7 @@ class Api {
         String fileName = files[j].path.split('/').last;
         newData.files.add(
           MapEntry(
-            "image",
+            "image[]",
             await MultipartFile.fromFile(
               files[j].path,
               filename: fileName,
@@ -70,15 +87,22 @@ class Api {
       }
 
       Response response = await dio.post(
-        "http://vehicle.paravsoftware.co.uk/api/report/${id}",
-        data: newData,
-      );
+          "http://vehicle.paravsoftware.co.uk/api/report/${id}",
+          data: newData,
+          options: Options(
+              contentType: 'application/json',
+              followRedirects: false,
+              validateStatus: (status) => true,
+              headers: {
+                "Accept": "application/json",
+              }));
       return response;
     } on DioError catch (e) {
       return e.response;
     }
   }
 
+  // Add check based on type (visual,vehicle,cabin)
   Future check(String token, String type, List<Map<String, dynamic>> datas,
       int id) async {
     dio.options.headers["Authorization"] = "Bearer $token";
@@ -90,6 +114,8 @@ class Api {
         data.fields
             .add(MapEntry("name[${datas[i]["name"]}]", datas[i]["name"]));
         data.fields.add(MapEntry("notes[${datas[i]["name"]}]",
+            datas[i]["comment"].isEmpty ? "--" : datas[i]["comment"]));
+        data.fields.add(MapEntry("feedback[${datas[i]["name"]}]",
             datas[i]["comment"].isEmpty ? "--" : datas[i]["comment"]));
         data.fields.add(MapEntry("status[${datas[i]["name"]}]",
             datas[i]["status"] ? "Good" : "Bad"));
@@ -106,12 +132,21 @@ class Api {
           );
         }
       }
-      Response response = await dio.post(
-        "api/visualcheck/${id}",
-        data: data,
-      );
+
+      Response response = await dio.post("/api/visualcheck/${id}",
+          data: data,
+          options: Options(
+              contentType: 'application/json',
+              followRedirects: false,
+              validateStatus: (status) => true,
+              headers: {
+                "Accept": "application/json",
+              }));
+      print(response.toString());
       return response;
     } on DioError catch (e) {
+      print(e.response.toString());
+
       return e.response;
     }
   }

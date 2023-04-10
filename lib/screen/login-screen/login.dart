@@ -34,7 +34,7 @@ class _LoginState extends ConsumerState<Login> {
     final String? email = prefs.getString('email');
     final String? password = prefs.getString('password');
 
-    if (remember != false && remember != null) {
+    if (remember == true) {
       Api().Login(email!, password!).then((value) {
         if (value.statusCode == 200) {
           ref.read(userProvider.notifier).update(
@@ -152,11 +152,13 @@ class _LoginState extends ConsumerState<Login> {
           setState(() {
             isLoading = false;
           });
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => DriverScreen(),
-            ),
-          );
+          if (isRememberMe) {
+            localStore(
+                isRememberMe, _emailController.text, _passwordController.text);
+          } else {
+            localStore(isRememberMe, "", "");
+          }
+
           return customAlert(
             context: context,
             height: height,

@@ -7,6 +7,8 @@ class Config {
   static const Color bg = Color(0xFFF2F1FF);
   static const Color white = Color.fromARGB(255, 255, 255, 255);
   static const Color black = Color.fromARGB(255, 0, 0, 0);
+  static const Color lightText = Color.fromARGB(255, 47, 46, 46);
+
   static const Color underLine = Color.fromARGB(197, 206, 205, 205);
   static const Color bgImg = Color(0xFF1017B1);
   static const Color bgCmd = Color(0xFFE0A32E);

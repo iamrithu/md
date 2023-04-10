@@ -6,11 +6,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:md/config/config.dart';
 import 'package:md/provider/provider.dart';
 import 'package:md/screen/check-screen/cabinCheck/cabilCheckScreen.dart';
-import 'package:md/screen/check-screen/visualCheck/visualCheckScreen.dart';
-import 'package:md/screen/report-screen/reportScreen.dart';
 
 import '../../../widgets/customCheckDetailField.dart';
-import '../../../widgets/customImageButton.dart';
 import '../../../widgets/globalButtonWidget.dart';
 
 class VehicleScreen extends ConsumerStatefulWidget {
@@ -38,59 +35,24 @@ class _VehicleScreenState extends ConsumerState<VehicleScreen> {
     double width = MediaQuery.of(context).size.width;
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Config.theme,
+          leading: InkWell(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Icon(
+              Icons.arrow_back_ios,
+              color: Config.white,
+            ),
+          ),
+        ),
         backgroundColor: Config.bg,
         body: Container(
           width: width,
           height: height,
           child: Column(
             children: [
-              Container(
-                color: Config.theme,
-                width: width,
-                height: height * 0.07,
-                alignment: Alignment.centerLeft,
-                child: Row(
-                  children: [
-                    InkWell(
-                      splashColor: Config.white,
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => VisualCheckScreen(),
-                          ),
-                        );
-                      },
-                      child: SizedBox(
-                        height: height * 0.05,
-                        child: Row(
-                          children: [
-                            SizedBox(
-                              width: 20,
-                            ),
-                            Icon(
-                              Icons.arrow_back_ios,
-                              color: Config.white,
-                              size: width / 30,
-                            ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            Text(
-                              "Back",
-                              style: GoogleFonts.mulish(
-                                textStyle: TextStyle(
-                                    color: Config.white,
-                                    fontSize: width / 30,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(15),
@@ -131,19 +93,6 @@ class _VehicleScreenState extends ConsumerState<VehicleScreen> {
                               width: width,
                               height: height,
                               click: () {
-                                for (var i = 0; i < vehicle_check.length; i++) {
-                                  if (vehicle_check[i]["image"].isEmpty) {
-                                    customAlert(
-                                        context: context,
-                                        height: height,
-                                        width: width,
-                                        content: "Kindly add images for ",
-                                        success: false,
-                                        content2:
-                                            " ${vehicle_check[i]["type"]}/${vehicle_check[i]["name"]}");
-                                    return;
-                                  }
-                                }
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (context) => CabinScreen(),

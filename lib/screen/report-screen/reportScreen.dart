@@ -29,59 +29,71 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
 
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Config.theme,
+          leading: InkWell(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Icon(
+              Icons.arrow_back_ios,
+              color: Config.white,
+            ),
+          ),
+        ),
         backgroundColor: Config.bg,
         body: Container(
           width: width,
           height: height,
           child: Column(
             children: [
-              Container(
-                color: Config.theme,
-                width: width,
-                height: height * 0.07,
-                alignment: Alignment.centerLeft,
-                child: Row(
-                  children: [
-                    InkWell(
-                      splashColor: Config.white,
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => DriverScreen(),
-                          ),
-                        );
-                      },
-                      child: SizedBox(
-                        height: height * 0.05,
-                        child: Row(
-                          children: [
-                            SizedBox(
-                              width: 20,
-                            ),
-                            Icon(
-                              Icons.arrow_back_ios,
-                              color: Config.white,
-                              size: width / 30,
-                            ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            Text(
-                              "Back",
-                              style: GoogleFonts.mulish(
-                                textStyle: TextStyle(
-                                    color: Config.white,
-                                    fontSize: width / 30,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
+              // Container(
+              //   color: Config.theme,
+              //   width: width,
+              //   height: height * 0.07,
+              //   alignment: Alignment.centerLeft,
+              //   child: Row(
+              //     children: [
+              //       InkWell(
+              //         splashColor: Config.white,
+              //         onTap: () {
+              //           Navigator.of(context).push(
+              //             MaterialPageRoute(
+              //               builder: (context) => DriverScreen(),
+              //             ),
+              //           );
+              //         },
+              //         child: SizedBox(
+              //           height: height * 0.05,
+              //           child: Row(
+              //             children: [
+              //               SizedBox(
+              //                 width: 20,
+              //               ),
+              //               Icon(
+              //                 Icons.arrow_back_ios,
+              //                 color: Config.white,
+              //                 size: width / 30,
+              //               ),
+              //               SizedBox(
+              //                 width: 10,
+              //               ),
+              //               Text(
+              //                 "Back",
+              //                 style: GoogleFonts.mulish(
+              //                   textStyle: TextStyle(
+              //                       color: Config.white,
+              //                       fontSize: width / 30,
+              //                       fontWeight: FontWeight.bold),
+              //                 ),
+              //               ),
+              //             ],
+              //           ),
+              //         ),
+              //       )
+              //     ],
+              //   ),
+              // ),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(15),
