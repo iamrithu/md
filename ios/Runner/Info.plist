@@ -31,16 +31,18 @@
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NSCameraUsageDescription</key>
-	<string>This app requires access to the Camera</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+   <string>This app requires constant access to your location to accurately report your location in case of emergencies or incidents while driving.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>This app needs access to location when in the background.</string>
+    <string>This app requires constant access to your location to accurately report your location in case of emergencies or incidents while driving.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>This app needs location data to help us find your current address if any incident happens.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>This app requires access to the microphone</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>This app requires access to the photo library.</string>
+	<string>This app requires access to the gallery to select photos for vehicle-checking purposes. In the event of an incident, photos may be taken as proof for documentation and reporting.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app requires access to the camera to capture photos for vehicle-checking purposes. In the event of an incident, photos may be taken as proof for documentation and reporting.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

@@ -113,6 +113,7 @@ class _CabinScreenState extends ConsumerState<CabinScreen> {
                                                 ["id"],
                                             object)
                                         .then((value) {
+                                      var data = value.data["data"];
                                       ref.read(inspectionId.notifier).update(
                                           (state) => value.data["data"]["id"]);
                                       if (value.statusCode == 200) {
@@ -124,12 +125,88 @@ class _CabinScreenState extends ConsumerState<CabinScreen> {
                                                 ref.watch(token),
                                                 "visual",
                                                 ref.watch(visualProvider),
-                                                value.data["data"]["id"])
+                                                data["id"])
                                             .then((value) {
+                                          print(value.toString());
                                           if (value.statusCode == 200) {
                                             setState(() {
                                               message =
                                                   "Vehicle Checking......";
+                                            });
+                                            Api()
+                                                .check(
+                                                    ref.watch(token),
+                                                    "vehicle",
+                                                    ref.watch(vehicleProvider),
+                                                    data["id"])
+                                                .then((value) {
+                                              if (value.statusCode == 200) {
+                                                setState(() {
+                                                  message =
+                                                      "Cabin Checking......";
+                                                });
+                                                Api()
+                                                    .check(
+                                                        ref.watch(token),
+                                                        "cabin",
+                                                        ref.watch(
+                                                            cabinProvider),
+                                                        data["id"])
+                                                    .then((value) {
+                                                  if (value.statusCode == 200) {
+                                                    setState(() {
+                                                      message =
+                                                          "Generate Summary......";
+                                                    });
+
+                                                    customAlert(
+                                                      context: context,
+                                                      height: height,
+                                                      width: width,
+                                                      content:
+                                                          "Data Stored Successfully",
+                                                      success: true,
+                                                    );
+                                                    setState(() {
+                                                      isLoading = false;
+                                                      message = "";
+                                                    });
+                                                    Navigator.of(context).push(
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            SummaryScreen(),
+                                                      ),
+                                                    );
+                                                    return;
+                                                  } else {
+                                                    setState(() {
+                                                      isLoading = false;
+                                                      message = "";
+                                                    });
+                                                    return customAlert(
+                                                      context: context,
+                                                      height: height,
+                                                      width: width,
+                                                      content:
+                                                          "Something went wrong on cabin check ",
+                                                      success: false,
+                                                    );
+                                                  }
+                                                });
+                                              } else {
+                                                setState(() {
+                                                  isLoading = false;
+                                                  message = "";
+                                                });
+                                                return customAlert(
+                                                  context: context,
+                                                  height: height,
+                                                  width: width,
+                                                  content:
+                                                      "Something went wrong on vehicle check ",
+                                                  success: false,
+                                                );
+                                              }
                                             });
                                           } else {
                                             setState(() {
@@ -145,81 +222,6 @@ class _CabinScreenState extends ConsumerState<CabinScreen> {
                                               success: false,
                                             );
                                             return null;
-                                          }
-                                        });
-
-                                        Api()
-                                            .check(
-                                                ref.watch(token),
-                                                "vehicle",
-                                                ref.watch(vehicleProvider),
-                                                value.data["data"]["id"])
-                                            .then((value) {
-                                          if (value.statusCode == 200) {
-                                            setState(() {
-                                              message = "Cabin Checking......";
-                                            });
-                                          } else {
-                                            setState(() {
-                                              isLoading = false;
-                                              message = "";
-                                            });
-                                            return customAlert(
-                                              context: context,
-                                              height: height,
-                                              width: width,
-                                              content:
-                                                  "Something went wrong on vehicle check ",
-                                              success: false,
-                                            );
-                                          }
-                                        });
-
-                                        Api()
-                                            .check(
-                                                ref.watch(token),
-                                                "cabin",
-                                                ref.watch(cabinProvider),
-                                                value.data["data"]["id"])
-                                            .then((value) {
-                                          if (value.statusCode == 200) {
-                                            setState(() {
-                                              message =
-                                                  "Generate Summary......";
-                                            });
-
-                                            customAlert(
-                                              context: context,
-                                              height: height,
-                                              width: width,
-                                              content:
-                                                  "Data Stored Successfully",
-                                              success: true,
-                                            );
-                                            setState(() {
-                                              isLoading = false;
-                                              message = "";
-                                            });
-                                            Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    SummaryScreen(),
-                                              ),
-                                            );
-                                            return;
-                                          } else {
-                                            setState(() {
-                                              isLoading = false;
-                                              message = "";
-                                            });
-                                            return customAlert(
-                                              context: context,
-                                              height: height,
-                                              width: width,
-                                              content:
-                                                  "Something went wrong on cabin check ",
-                                              success: false,
-                                            );
                                           }
                                         });
                                       } else {

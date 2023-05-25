@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../config/config.dart';
 import '../provider/provider.dart';
@@ -32,6 +33,7 @@ class _CustomImageAddingFieldState
   List<File> images = [];
   List<Map<String, dynamic>> dataList = [];
   String comment = "Good";
+  String statuss = "";
 
   @override
   void initState() {
@@ -58,6 +60,21 @@ class _CustomImageAddingFieldState
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
+
+    // testCompressAndGetFile(File file) async {
+    //   var result = await FlutterImageCompress.compressAndGetFile(
+    //     file.absolute.path,
+    //     file.absolute.path
+    //             .substring(0, file.absolute.path.lastIndexOf('.') + 0) +
+    //         "${DateFormat("hhmmss").format(DateTime.now())}." +
+    //         file.absolute.path
+    //             .substring(file.absolute.path.lastIndexOf('.') + 1),
+    //     quality: 50,
+    //   );
+
+    //   return result!;
+    // }
+
     reloadProvider(List<Map<String, dynamic>> val) {
       if (widget.type == "visual_check") {
         ref.read(visualProvider.notifier).state = [];
@@ -76,18 +93,97 @@ class _CustomImageAddingFieldState
       }
     }
 
+    Future<bool?> _checkPermission(BuildContext context) async {
+      if (Platform.isAndroid) {
+        Map<Permission, PermissionStatus> statues =
+            await [Permission.camera, Permission.photos].request();
+        PermissionStatus? statusCamera = statues[Permission.camera];
+
+        PermissionStatus? statusPhotos = statues[Permission.photos];
+        bool isGranted = statusCamera == PermissionStatus.granted &&
+            statusPhotos == PermissionStatus.granted;
+        if (isGranted) {
+          return true;
+        }
+        bool isPermanentlyDenied =
+            statusCamera == PermissionStatus.permanentlyDenied ||
+                statusPhotos == PermissionStatus.permanentlyDenied;
+        if (isPermanentlyDenied) {
+          return false;
+        }
+      } else {
+        Map<Permission, PermissionStatus> statues = await [
+          Permission.camera,
+          Permission.storage,
+          Permission.photos
+        ].request();
+        PermissionStatus? statusCamera = statues[Permission.camera];
+        PermissionStatus? statusStorage = statues[Permission.storage];
+        PermissionStatus? statusPhotos = statues[Permission.photos];
+        bool isGranted = statusCamera == PermissionStatus.granted &&
+            statusStorage == PermissionStatus.granted &&
+            statusPhotos == PermissionStatus.granted;
+        if (isGranted) {
+          return true;
+        }
+        bool isPermanentlyDenied =
+            statusCamera == PermissionStatus.permanentlyDenied ||
+                statusStorage == PermissionStatus.permanentlyDenied ||
+                statusPhotos == PermissionStatus.permanentlyDenied;
+        if (isPermanentlyDenied) {
+          return false;
+        }
+      }
+    }
+
+    void launchAppSettings() {
+      openAppSettings();
+    }
+
+    Future<void> requestStoragePermission() async {
+      final PermissionStatus permissionStatus =
+          await Permission.manageExternalStorage.request();
+      if (permissionStatus == PermissionStatus.granted) {
+        print("granded");
+      } else {
+        final PermissionStatus permissionStatus =
+            await Permission.manageExternalStorage.request();
+        if (permissionStatus == PermissionStatus.granted) {
+          // Permission granted.
+        } else {
+          // Permission denied.
+        }
+      }
+    }
+
     return AlertDialog(
       elevation: 10,
       backgroundColor: Config.bg,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      title: Text(
-        widget.type == "visual_check" ? "Visual Check" : widget.type,
-        style: GoogleFonts.mulish(
-          textStyle: TextStyle(
-              color: Config.theme,
-              fontSize: width / 25,
-              fontWeight: FontWeight.bold),
-        ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      title: Row(
+        children: [
+          Text(
+            widget.type == "visual_check" ? "Visual Check" : widget.type,
+            style: GoogleFonts.mulish(
+              textStyle: TextStyle(
+                  color: Config.theme,
+                  fontSize: width / 25,
+                  fontWeight: FontWeight.bold),
+            ),
+          ),
+          widget.type == "visual_check"
+              ? Text(
+                  textAlign: TextAlign.center,
+                  "  *",
+                  style: GoogleFonts.mulish(
+                    textStyle: TextStyle(
+                        color: Config.black,
+                        fontSize: width / 37,
+                        fontWeight: FontWeight.bold),
+                  ),
+                )
+              : Text("")
+        ],
       ),
       content: Container(
         width: width,
@@ -117,7 +213,7 @@ class _CustomImageAddingFieldState
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: Config.white,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: Config.underLine),
                 ),
                 child: SingleChildScrollView(
@@ -133,11 +229,23 @@ class _CustomImageAddingFieldState
                                 "Please add image",
                                 style: GoogleFonts.mulish(
                                   textStyle: TextStyle(
-                                      color: Color.fromARGB(255, 246, 92, 105),
+                                      color: Config.bgFail,
                                       fontSize: width / 40,
                                       fontWeight: FontWeight.bold),
                                 ),
                               ),
+                              widget.type == "visual_check"
+                                  ? Text(
+                                      textAlign: TextAlign.center,
+                                      "*",
+                                      style: GoogleFonts.mulish(
+                                        textStyle: TextStyle(
+                                            color: Config.bgFail,
+                                            fontSize: width / 25,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    )
+                                  : Text("")
                             ],
                           ),
                         ),
@@ -228,53 +336,62 @@ class _CustomImageAddingFieldState
                     txtColor: Config.theme,
                     bgColor: Config.bg,
                     click: () async {
-                      FilePickerResult? result =
-                          await FilePicker.platform.pickFiles(
-                        allowMultiple: true,
-                        type: FileType.image,
-                      );
+                      final ImagePicker picker = ImagePicker();
 
-                      if (result != null) {
-                        List<File> files =
-                            result.paths.map((path) => File(path!)).toList();
+                      try {
+                        final List<XFile> result =
+                            await picker.pickMultiImage();
 
-                        for (var i = 0; i < files.length; i++) {
-                          setState(() {
-                            images.add(files[i]);
-                          });
+                        if (result.isNotEmpty) {
+                          List<File> files =
+                              result.map((path) => File(path.path)).toList();
+
+                          for (var i = 0; i < files.length; i++) {
+                            // File newfile = await testCompressAndGetFile(files[i]);
+
+                            setState(() {
+                              images.add(files[i]);
+                            });
+                          }
+                          if (dataList.isEmpty) {
+                            dataList.add({
+                              "type": widget.type,
+                              "name": widget.lable,
+                              "comment": comment,
+                              "status": true,
+                              "image": images
+                            });
+                          }
+
+                          try {
+                            Map<String, dynamic> object = dataList
+                                .firstWhere((e) => e["name"] == widget.lable);
+                            object["image"] = images;
+                          } catch (e) {
+                            dataList.add({
+                              "type": widget.type,
+                              "name": widget.lable,
+                              "comment": comment,
+                              "status": true,
+                              "image": images
+                            });
+                          }
+
+                          reloadProvider(dataList);
+                        } else {
+                          // User canceled the picker
                         }
-                        if (dataList.isEmpty) {
-                          dataList.add({
-                            "type": widget.type,
-                            "name": widget.lable,
-                            "comment": comment,
-                            "status": true,
-                            "image": images
-                          });
+                      } catch (e) {
+                        var status = await Permission.camera.status;
+                        if (status.isDenied) {
+                          customAlertPermistion(context, width,
+                              "Allow access to gallery and photos");
                         }
-
-                        try {
-                          Map<String, dynamic> object = dataList
-                              .firstWhere((e) => e["name"] == widget.lable);
-                          object["image"] = images;
-                        } catch (e) {
-                          dataList.add({
-                            "type": widget.type,
-                            "name": widget.lable,
-                            "comment": comment,
-                            "status": true,
-                            "image": images
-                          });
-                        }
-
-                        reloadProvider(dataList);
-                      } else {
-                        // User canceled the picker
                       }
                     },
                     width: width * 0.3,
                     height: height * 0.07,
-                    lable: "Gallary",
+                    lable: "Gallery",
                   ),
                   CustomButton(
                     boderColor: Config.white,
@@ -285,9 +402,9 @@ class _CustomImageAddingFieldState
                       final ImagePicker _picker = ImagePicker();
 
                       try {
-                        final image = await _picker.pickImage(
+                        final XFile? image = await _picker.pickImage(
                             source: ImageSource.camera,
-                            imageQuality: 2,
+                            imageQuality: 100,
                             preferredCameraDevice: CameraDevice.rear);
 
                         if (image == null)
@@ -295,13 +412,14 @@ class _CustomImageAddingFieldState
                               context: context,
                               height: height,
                               width: width,
-                              content: "your camera image is null",
+                              content: "No image captured",
                               success: false);
                         ;
-                        File imageTemporay = File(image.path);
+                        // File newfile =
+                        //     await testCompressAndGetFile(File(image.path));
 
                         setState(() {
-                          images.add(imageTemporay);
+                          images.add(File(image.path));
                         });
                         if (dataList.isEmpty) {
                           dataList.add({
@@ -328,8 +446,12 @@ class _CustomImageAddingFieldState
                         }
 
                         reloadProvider(dataList);
-                      } on PlatformException catch (e) {
-                        print("Failed to pick image : $e");
+                      } catch (e) {
+                        var status = await Permission.camera.status;
+                        if (status.isDenied) {
+                          customAlertPermistion(
+                              context, width, "Allow access to camera");
+                        }
                       }
                       // Navigator.pop(context);
                     },
@@ -340,6 +462,7 @@ class _CustomImageAddingFieldState
                 ],
               ),
             ),
+            Text(statuss),
             CustomButton(
               boderColor: Config.white,
               radius: 4,

@@ -25,6 +25,7 @@ class CustomTextForm extends StatefulWidget {
 }
 
 class _CustomTextFormState extends State<CustomTextForm> {
+  bool visible = false;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -49,18 +50,31 @@ class _CustomTextFormState extends State<CustomTextForm> {
           onTapOutside: (value) {
             SystemChannels.textInput.invokeMethod('TextInput.hide');
           },
+
           controller: widget.controller,
           keyboardType: widget.lable == "Password"
               ? TextInputType.visiblePassword
               : widget.lable == "Phone Number of Witness"
                   ? TextInputType.phone
                   : TextInputType.text,
-          obscureText: widget.hide,
+          obscureText: widget.lable == "Password" ? !visible : widget.hide,
           style: TextStyle(
               fontWeight: FontWeight.normal,
               fontSize: widget.width / 32,
               color: Config.lightText),
           decoration: InputDecoration(
+            suffixIcon: widget.lable == "Password"
+                ? InkWell(
+                    onTap: () {
+                      setState(() {
+                        visible = !visible;
+                      });
+                    },
+                    child: Icon(
+                      visible ? Icons.visibility : Icons.visibility_off,
+                    ),
+                  )
+                : null,
             filled: true,
             fillColor: Config.white,
             contentPadding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),

@@ -70,6 +70,15 @@ class _VisualCheckScreenState extends ConsumerState<VisualCheckScreen> {
                                   fontWeight: FontWeight.bold),
                             ),
                           ),
+                          Text(
+                            "   *",
+                            style: GoogleFonts.mulish(
+                              textStyle: TextStyle(
+                                  color: Config.theme,
+                                  fontSize: width / 34,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
                         ],
                       ),
                       SizedBox(

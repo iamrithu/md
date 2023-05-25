@@ -92,15 +92,15 @@ class _CustomDetailContainerState extends ConsumerState<CustomDetailContainer> {
                       child: widget.isText
                           ? TextFormField(
                               initialValue: ref.watch(milage),
+                              keyboardAppearance: Brightness.dark,
                               onTapOutside: (value) {
                                 SystemChannels.textInput
                                     .invokeMethod('TextInput.hide');
+                                FocusScope.of(context)
+                                    .requestFocus(new FocusNode());
                               },
                               onChanged: (e) {
-                                print(e);
                                 ref.read(milage.notifier).update((state) => e);
-
-                                print(ref.watch(milage));
                               },
 
                               keyboardType: TextInputType.number,

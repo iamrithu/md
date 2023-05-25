@@ -101,7 +101,7 @@ class _LoginState extends ConsumerState<Login> {
             context: context,
             height: height,
             width: width,
-            content: "Please Enter Proper Values",
+            content: "Please try again",
             success: false);
       }
       if (!_emailController.text.contains("@")) {
@@ -109,7 +109,7 @@ class _LoginState extends ConsumerState<Login> {
           context: context,
           height: height,
           width: width,
-          content: "Invalid Email Address",
+          content: "Invalid Email ",
           success: false,
         );
       }
@@ -199,38 +199,38 @@ class _LoginState extends ConsumerState<Login> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Card(
-                              child: Container(
-                                color: Config.white,
-                                padding: EdgeInsets.all(5),
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      "ENG",
-                                      style: GoogleFonts.mulish(
-                                        textStyle: TextStyle(
-                                            color: Config.black,
-                                            fontSize: width / 28,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 5,
-                                    ),
-                                    Image.asset(
-                                      "assets/globe.png",
-                                      scale: 1.1,
-                                    )
-                                  ],
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
+                        // Row(
+                        //   mainAxisAlignment: MainAxisAlignment.end,
+                        //   crossAxisAlignment: CrossAxisAlignment.center,
+                        //   children: [
+                        //     Card(
+                        //       child: Container(
+                        //         color: Config.white,
+                        //         padding: EdgeInsets.all(5),
+                        //         child: Row(
+                        //           children: [
+                        //             Text(
+                        //               "ENG",
+                        //               style: GoogleFonts.mulish(
+                        //                 textStyle: TextStyle(
+                        //                     color: Config.black,
+                        //                     fontSize: width / 28,
+                        //                     fontWeight: FontWeight.bold),
+                        //               ),
+                        //             ),
+                        //             SizedBox(
+                        //               width: 5,
+                        //             ),
+                        //             Image.asset(
+                        //               "assets/globe.png",
+                        //               scale: 1.1,
+                        //             )
+                        //           ],
+                        //         ),
+                        //       ),
+                        //     )
+                        //   ],
+                        // ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           crossAxisAlignment: CrossAxisAlignment.center,

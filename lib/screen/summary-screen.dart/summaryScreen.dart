@@ -20,6 +20,8 @@ class SummaryScreen extends ConsumerStatefulWidget {
 
 class _SummaryScreenState extends ConsumerState<SummaryScreen> {
   List<String> viewList = [];
+  List<String> viewCmdList = [];
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -199,7 +201,7 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                                   child: Row(
                                     children: [
                                       Container(
-                                        width: width * 0.6,
+                                        width: width * 0.5,
                                         color: Config.white,
                                         padding: const EdgeInsets.all(10),
                                         alignment: Alignment.centerLeft,
@@ -230,7 +232,11 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                                                 : "Bad",
                                             style: GoogleFonts.mulish(
                                               textStyle: TextStyle(
-                                                  color: Config.black,
+                                                  color: ref.watch(
+                                                              visualProvider)[i]
+                                                          ["status"]
+                                                      ? Config.bgSuc
+                                                      : Config.bgFail,
                                                   fontSize: width / 34,
                                                   fontWeight: FontWeight.bold),
                                             ),
@@ -240,6 +246,17 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                                       Expanded(
                                         child: InkWell(
                                           onTap: () {
+                                            try {
+                                              if (viewCmdList.contains(
+                                                  ref.watch(visualProvider)[i]
+                                                      ["name"])) {
+                                                setState(() {
+                                                  viewCmdList.remove(ref.watch(
+                                                          visualProvider)[i]
+                                                      ["name"]);
+                                                });
+                                              }
+                                            } catch (e) {}
                                             if (viewList.isEmpty) {
                                               return setState(() {
                                                 viewList.add(
@@ -276,8 +293,69 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                                             padding: const EdgeInsets.all(10),
                                             color: Config.white,
                                             child: Icon(
-                                              Icons.visibility,
+                                              Icons.photo,
                                               color: viewList.contains(
+                                                      ref.watch(
+                                                              visualProvider)[i]
+                                                          ["name"])
+                                                  ? Config.theme
+                                                  : Config.black,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: InkWell(
+                                          onTap: () {
+                                            try {
+                                              if (viewList.contains(
+                                                  ref.watch(visualProvider)[i]
+                                                      ["name"])) {
+                                                setState(() {
+                                                  viewList.remove(ref.watch(
+                                                          visualProvider)[i]
+                                                      ["name"]);
+                                                });
+                                              }
+                                            } catch (e) {}
+                                            if (viewCmdList.isEmpty) {
+                                              return setState(() {
+                                                viewCmdList.add(
+                                                    ref.watch(visualProvider)[i]
+                                                        ["name"]);
+                                              });
+                                            }
+                                            try {
+                                              if (viewCmdList.contains(
+                                                  ref.watch(visualProvider)[i]
+                                                      ["name"])) {
+                                                setState(() {
+                                                  viewCmdList.remove(ref.watch(
+                                                          visualProvider)[i]
+                                                      ["name"]);
+                                                });
+                                              } else {
+                                                setState(() {
+                                                  viewCmdList.add(ref.watch(
+                                                          visualProvider)[i]
+                                                      ["name"]);
+                                                });
+                                              }
+                                            } catch (e) {
+                                              setState(() {
+                                                viewCmdList.add(
+                                                    ref.watch(visualProvider)[i]
+                                                        ["name"]);
+                                              });
+                                            }
+                                          },
+                                          child: Container(
+                                            height: height * 0.07,
+                                            padding: const EdgeInsets.all(10),
+                                            color: Config.white,
+                                            child: Icon(
+                                              Icons.comment,
+                                              color: viewCmdList.contains(
                                                       ref.watch(
                                                               visualProvider)[i]
                                                           ["name"])
@@ -371,6 +449,92 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                                             ],
                                           ),
                                         ),
+                                ),
+                                AnimatedContainer(
+                                  duration: Duration(milliseconds: 300),
+                                  margin: EdgeInsets.all(1),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Config.underLine),
+                                    color: Config.bg,
+                                  ),
+                                  width: width,
+                                  height: viewCmdList.contains(
+                                          ref.watch(visualProvider)[i]["name"])
+                                      ? ref
+                                              .watch(visualProvider)[i]
+                                                  ["comment"]
+                                              .isEmpty
+                                          ? height * 0.07
+                                          : height * 0.2
+                                      : 0,
+                                  child: ref
+                                          .watch(visualProvider)[i]["comment"]
+                                          .isEmpty
+                                      ? Center(
+                                          child: Text(
+                                            "No coment found",
+                                            style: GoogleFonts.mulish(
+                                              textStyle: TextStyle(
+                                                  color: Config.theme,
+                                                  fontSize: width / 40,
+                                                  fontWeight: FontWeight.w400),
+                                            ),
+                                          ),
+                                        )
+                                      : Card(
+                                          elevation: 10,
+                                          child: Padding(
+                                            padding: EdgeInsets.all(10),
+                                            child: Column(
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      "Notes :",
+                                                      style: GoogleFonts.mulish(
+                                                        textStyle: TextStyle(
+                                                            color: Config.theme,
+                                                            fontSize:
+                                                                width / 28,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w400),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                Expanded(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: ListView(
+                                                      children: [
+                                                        Text(
+                                                          ref
+                                                              .watch(visualProvider)[
+                                                                  i]["comment"]
+                                                              .toString(),
+                                                          style: GoogleFonts
+                                                              .mulish(
+                                                            textStyle: TextStyle(
+                                                                color: Config
+                                                                    .lightText,
+                                                                fontSize:
+                                                                    width / 35,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
                                 )
                               ],
                             ),
@@ -409,7 +573,7 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                                   child: Row(
                                     children: [
                                       Container(
-                                        width: width * 0.6,
+                                        width: width * 0.5,
                                         color: Config.white,
                                         padding: const EdgeInsets.all(10),
                                         alignment: Alignment.centerLeft,
@@ -440,7 +604,11 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                                                 : "Bad",
                                             style: GoogleFonts.mulish(
                                               textStyle: TextStyle(
-                                                  color: Config.black,
+                                                  color: ref.watch(
+                                                              vehicleProvider)[
+                                                          i]["status"]
+                                                      ? Config.bgSuc
+                                                      : Config.bgFail,
                                                   fontSize: width / 34,
                                                   fontWeight: FontWeight.bold),
                                             ),
@@ -450,6 +618,17 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                                       Expanded(
                                         child: InkWell(
                                           onTap: () {
+                                            try {
+                                              if (viewCmdList.contains(
+                                                  ref.watch(vehicleProvider)[i]
+                                                      ["name"])) {
+                                                setState(() {
+                                                  viewCmdList.remove(ref.watch(
+                                                          vehicleProvider)[i]
+                                                      ["name"]);
+                                                });
+                                              }
+                                            } catch (e) {}
                                             if (viewList.isEmpty) {
                                               return setState(() {
                                                 viewList.add(ref.watch(
@@ -486,8 +665,69 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                                             padding: const EdgeInsets.all(10),
                                             color: Config.white,
                                             child: Icon(
-                                              Icons.visibility,
+                                              Icons.photo,
                                               color: viewList.contains(
+                                                      ref.watch(
+                                                              vehicleProvider)[
+                                                          i]["name"])
+                                                  ? Config.theme
+                                                  : Config.black,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: InkWell(
+                                          onTap: () {
+                                            try {
+                                              if (viewList.contains(
+                                                  ref.watch(vehicleProvider)[i]
+                                                      ["name"])) {
+                                                setState(() {
+                                                  viewList.remove(ref.watch(
+                                                          vehicleProvider)[i]
+                                                      ["name"]);
+                                                });
+                                              }
+                                            } catch (e) {}
+                                            if (viewCmdList.isEmpty) {
+                                              return setState(() {
+                                                viewCmdList.add(ref.watch(
+                                                        vehicleProvider)[i]
+                                                    ["name"]);
+                                              });
+                                            }
+                                            try {
+                                              if (viewCmdList.contains(
+                                                  ref.watch(vehicleProvider)[i]
+                                                      ["name"])) {
+                                                setState(() {
+                                                  viewCmdList.remove(ref.watch(
+                                                          vehicleProvider)[i]
+                                                      ["name"]);
+                                                });
+                                              } else {
+                                                setState(() {
+                                                  viewCmdList.add(ref.watch(
+                                                          vehicleProvider)[i]
+                                                      ["name"]);
+                                                });
+                                              }
+                                            } catch (e) {
+                                              setState(() {
+                                                viewCmdList.add(ref.watch(
+                                                        vehicleProvider)[i]
+                                                    ["name"]);
+                                              });
+                                            }
+                                          },
+                                          child: Container(
+                                            height: height * 0.07,
+                                            padding: const EdgeInsets.all(10),
+                                            color: Config.white,
+                                            child: Icon(
+                                              Icons.comment,
+                                              color: viewCmdList.contains(
                                                       ref.watch(
                                                               vehicleProvider)[
                                                           i]["name"])
@@ -582,9 +822,281 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                                             ],
                                           ),
                                         ),
+                                ),
+                                AnimatedContainer(
+                                  duration: Duration(milliseconds: 300),
+                                  margin: EdgeInsets.all(1),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Config.underLine),
+                                    color: Config.bg,
+                                  ),
+                                  width: width,
+                                  height: viewCmdList.contains(
+                                          ref.watch(vehicleProvider)[i]["name"])
+                                      ? ref
+                                              .watch(vehicleProvider)[i]
+                                                  ["comment"]
+                                              .isEmpty
+                                          ? height * 0.07
+                                          : height * 0.2
+                                      : 0,
+                                  child: ref
+                                          .watch(vehicleProvider)[i]["comment"]
+                                          .isEmpty
+                                      ? Center(
+                                          child: Text(
+                                            "No coment found",
+                                            style: GoogleFonts.mulish(
+                                              textStyle: TextStyle(
+                                                  color: Config.theme,
+                                                  fontSize: width / 40,
+                                                  fontWeight: FontWeight.w400),
+                                            ),
+                                          ),
+                                        )
+                                      : Card(
+                                          elevation: 10,
+                                          child: Padding(
+                                            padding: EdgeInsets.all(10),
+                                            child: Column(
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      "Notes :",
+                                                      style: GoogleFonts.mulish(
+                                                        textStyle: TextStyle(
+                                                            color: Config.theme,
+                                                            fontSize:
+                                                                width / 28,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w400),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                Expanded(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: ListView(
+                                                      children: [
+                                                        Text(
+                                                          ref
+                                                              .watch(vehicleProvider)[
+                                                                  i]["comment"]
+                                                              .toString(),
+                                                          style: GoogleFonts
+                                                              .mulish(
+                                                            textStyle: TextStyle(
+                                                                color: Config
+                                                                    .lightText,
+                                                                fontSize:
+                                                                    width / 35,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
                                 )
                               ],
                             ),
+                        // Column(
+                        //   children: [
+                        //     Container(
+                        //       width: width,
+                        //       height: height * 0.07,
+                        //       decoration: BoxDecoration(
+                        //           border: Border.all(color: Config.white)),
+                        //       child: Row(
+                        //         children: [
+                        //           Container(
+                        //             width: width * 0.6,
+                        //             color: Config.white,
+                        //             padding: const EdgeInsets.all(10),
+                        //             alignment: Alignment.centerLeft,
+                        //             child: Wrap(
+                        //               children: [
+                        //                 Text(
+                        //                   "${ref.watch(vehicleProvider)[i]["name"]}",
+                        //                   style: GoogleFonts.mulish(
+                        //                     textStyle: TextStyle(
+                        //                         color: Config.black,
+                        //                         fontSize: width / 34,
+                        //                         fontWeight:
+                        //                             FontWeight.bold),
+                        //                   ),
+                        //                 ),
+                        //               ],
+                        //             ),
+                        //           ),
+                        //           Container(
+                        //             width: width * 0.2,
+                        //             color: Config.white,
+                        //             padding: const EdgeInsets.all(10),
+                        //             child: Center(
+                        //               child: Text(
+                        //                 ref.watch(vehicleProvider)[i]
+                        //                         ["status"]
+                        //                     ? "Good"
+                        //                     : "Bad",
+                        //                 style: GoogleFonts.mulish(
+                        //                   textStyle: TextStyle(
+                        //                       color: Config.black,
+                        //                       fontSize: width / 34,
+                        //                       fontWeight: FontWeight.bold),
+                        //                 ),
+                        //               ),
+                        //             ),
+                        //           ),
+                        //           Expanded(
+                        //             child: InkWell(
+                        //               onTap: () {
+                        //                 if (viewList.isEmpty) {
+                        //                   return setState(() {
+                        //                     viewList.add(ref.watch(
+                        //                             vehicleProvider)[i]
+                        //                         ["name"]);
+                        //                   });
+                        //                 }
+                        //                 try {
+                        //                   if (viewList.contains(
+                        //                       ref.watch(vehicleProvider)[i]
+                        //                           ["name"])) {
+                        //                     setState(() {
+                        //                       viewList.remove(ref.watch(
+                        //                               vehicleProvider)[i]
+                        //                           ["name"]);
+                        //                     });
+                        //                   } else {
+                        //                     setState(() {
+                        //                       viewList.add(ref.watch(
+                        //                               vehicleProvider)[i]
+                        //                           ["name"]);
+                        //                     });
+                        //                   }
+                        //                 } catch (e) {
+                        //                   setState(() {
+                        //                     viewList.add(ref.watch(
+                        //                             vehicleProvider)[i]
+                        //                         ["name"]);
+                        //                   });
+                        //                 }
+                        //               },
+                        //               child: Container(
+                        //                 height: height * 0.07,
+                        //                 padding: const EdgeInsets.all(10),
+                        //                 color: Config.white,
+                        //                 child: Icon(
+                        //                   Icons.visibility,
+                        //                   color: viewList.contains(
+                        //                           ref.watch(
+                        //                                   vehicleProvider)[
+                        //                               i]["name"])
+                        //                       ? Config.theme
+                        //                       : Config.black,
+                        //                 ),
+                        //               ),
+                        //             ),
+                        //           )
+                        //         ],
+                        //       ),
+                        //     ),
+                        //     AnimatedContainer(
+                        //       duration: Duration(milliseconds: 300),
+                        //       margin: EdgeInsets.all(1),
+                        //       decoration: BoxDecoration(
+                        //         border: Border.all(color: Config.underLine),
+                        //         color: Config.bg,
+                        //       ),
+                        //       width: width,
+                        //       height: viewList.contains(
+                        //               ref.watch(vehicleProvider)[i]["name"])
+                        //           ? ref
+                        //                   .watch(vehicleProvider)[i]
+                        //                       ["image"]
+                        //                   .isEmpty
+                        //               ? height * 0.07
+                        //               : height * 0.2
+                        //           : 0,
+                        //       child: ref
+                        //               .watch(vehicleProvider)[i]["image"]
+                        //               .isEmpty
+                        //           ? Center(
+                        //               child: Text(
+                        //                 "No image found",
+                        //                 style: GoogleFonts.mulish(
+                        //                   textStyle: TextStyle(
+                        //                       color: Config.theme,
+                        //                       fontSize: width / 40,
+                        //                       fontWeight: FontWeight.w400),
+                        //                 ),
+                        //               ),
+                        //             )
+                        //           : Padding(
+                        //               padding: EdgeInsets.all(5),
+                        //               child: ListView(
+                        //                 scrollDirection: Axis.horizontal,
+                        //                 children: [
+                        //                   for (var j = 0;
+                        //                       j <
+                        //                           ref
+                        //                               .watch(vehicleProvider)[
+                        //                                   i]["image"]
+                        //                               .length;
+                        //                       j++)
+                        //                     Padding(
+                        //                       padding:
+                        //                           const EdgeInsets.all(8.0),
+                        //                       child: Card(
+                        //                         shape:
+                        //                             RoundedRectangleBorder(
+                        //                           borderRadius:
+                        //                               BorderRadius.circular(
+                        //                                   10),
+                        //                         ),
+                        //                         elevation: 10,
+                        //                         child: Container(
+                        //                           width: width * 0.4,
+                        //                           height: height * 0.17,
+                        //                           decoration: BoxDecoration(
+                        //                             borderRadius:
+                        //                                 BorderRadius
+                        //                                     .circular(10),
+                        //                             border: Border.all(
+                        //                                 color:
+                        //                                     Config.white),
+                        //                           ),
+                        //                           child: ClipRRect(
+                        //                             borderRadius:
+                        //                                 BorderRadius
+                        //                                     .circular(10),
+                        //                             child: Image.file(
+                        //                               ref.watch(
+                        //                                       vehicleProvider)[
+                        //                                   i]["image"][j],
+                        //                               fit: BoxFit.cover,
+                        //                             ),
+                        //                           ),
+                        //                         ),
+                        //                       ),
+                        //                     ),
+                        //                 ],
+                        //               ),
+                        //             ),
+                        //     )
+                        //   ],
+                        // ),
                         SizedBox(
                           height: 10,
                         ),
@@ -620,7 +1132,7 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                                   child: Row(
                                     children: [
                                       Container(
-                                        width: width * 0.6,
+                                        width: width * 0.5,
                                         color: Config.white,
                                         padding: const EdgeInsets.all(10),
                                         alignment: Alignment.centerLeft,
@@ -651,7 +1163,11 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                                                 : "Bad",
                                             style: GoogleFonts.mulish(
                                               textStyle: TextStyle(
-                                                  color: Config.black,
+                                                  color: ref.watch(
+                                                              cabinProvider)[i]
+                                                          ["status"]
+                                                      ? Config.bgSuc
+                                                      : Config.bgFail,
                                                   fontSize: width / 34,
                                                   fontWeight: FontWeight.bold),
                                             ),
@@ -661,6 +1177,17 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                                       Expanded(
                                         child: InkWell(
                                           onTap: () {
+                                            try {
+                                              if (viewCmdList.contains(
+                                                  ref.watch(cabinProvider)[i]
+                                                      ["name"])) {
+                                                setState(() {
+                                                  viewCmdList.remove(ref.watch(
+                                                          cabinProvider)[i]
+                                                      ["name"]);
+                                                });
+                                              }
+                                            } catch (e) {}
                                             if (viewList.isEmpty) {
                                               return setState(() {
                                                 viewList.add(
@@ -697,8 +1224,69 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                                             padding: const EdgeInsets.all(10),
                                             color: Config.white,
                                             child: Icon(
-                                              Icons.visibility,
+                                              Icons.photo,
                                               color: viewList.contains(
+                                                      ref.watch(
+                                                              cabinProvider)[i]
+                                                          ["name"])
+                                                  ? Config.theme
+                                                  : Config.black,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: InkWell(
+                                          onTap: () {
+                                            try {
+                                              if (viewList.contains(
+                                                  ref.watch(cabinProvider)[i]
+                                                      ["name"])) {
+                                                setState(() {
+                                                  viewList.remove(ref.watch(
+                                                          cabinProvider)[i]
+                                                      ["name"]);
+                                                });
+                                              }
+                                            } catch (e) {}
+                                            if (viewCmdList.isEmpty) {
+                                              return setState(() {
+                                                viewCmdList.add(
+                                                    ref.watch(cabinProvider)[i]
+                                                        ["name"]);
+                                              });
+                                            }
+                                            try {
+                                              if (viewCmdList.contains(
+                                                  ref.watch(cabinProvider)[i]
+                                                      ["name"])) {
+                                                setState(() {
+                                                  viewCmdList.remove(ref.watch(
+                                                          cabinProvider)[i]
+                                                      ["name"]);
+                                                });
+                                              } else {
+                                                setState(() {
+                                                  viewCmdList.add(ref.watch(
+                                                          cabinProvider)[i]
+                                                      ["name"]);
+                                                });
+                                              }
+                                            } catch (e) {
+                                              setState(() {
+                                                viewCmdList.add(
+                                                    ref.watch(cabinProvider)[i]
+                                                        ["name"]);
+                                              });
+                                            }
+                                          },
+                                          child: Container(
+                                            height: height * 0.07,
+                                            padding: const EdgeInsets.all(10),
+                                            color: Config.white,
+                                            child: Icon(
+                                              Icons.comment,
+                                              color: viewCmdList.contains(
                                                       ref.watch(
                                                               cabinProvider)[i]
                                                           ["name"])
@@ -792,9 +1380,280 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                                             ],
                                           ),
                                         ),
+                                ),
+                                AnimatedContainer(
+                                  duration: Duration(milliseconds: 300),
+                                  margin: EdgeInsets.all(1),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Config.underLine),
+                                    color: Config.bg,
+                                  ),
+                                  width: width,
+                                  height: viewCmdList.contains(
+                                          ref.watch(cabinProvider)[i]["name"])
+                                      ? ref
+                                              .watch(cabinProvider)[i]
+                                                  ["comment"]
+                                              .isEmpty
+                                          ? height * 0.07
+                                          : height * 0.2
+                                      : 0,
+                                  child: ref
+                                          .watch(cabinProvider)[i]["comment"]
+                                          .isEmpty
+                                      ? Center(
+                                          child: Text(
+                                            "No coment found",
+                                            style: GoogleFonts.mulish(
+                                              textStyle: TextStyle(
+                                                  color: Config.theme,
+                                                  fontSize: width / 40,
+                                                  fontWeight: FontWeight.w400),
+                                            ),
+                                          ),
+                                        )
+                                      : Card(
+                                          elevation: 10,
+                                          child: Padding(
+                                            padding: EdgeInsets.all(10),
+                                            child: Column(
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      "Notes :",
+                                                      style: GoogleFonts.mulish(
+                                                        textStyle: TextStyle(
+                                                            color: Config.theme,
+                                                            fontSize:
+                                                                width / 28,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w400),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                Expanded(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: ListView(
+                                                      children: [
+                                                        Text(
+                                                          ref
+                                                              .watch(cabinProvider)[
+                                                                  i]["comment"]
+                                                              .toString(),
+                                                          style: GoogleFonts
+                                                              .mulish(
+                                                            textStyle: TextStyle(
+                                                                color: Config
+                                                                    .lightText,
+                                                                fontSize:
+                                                                    width / 35,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
                                 )
                               ],
                             ),
+                        // Column(
+                        //   children: [
+                        //     Container(
+                        //       width: width,
+                        //       height: height * 0.07,
+                        //       decoration: BoxDecoration(
+                        //           border: Border.all(color: Config.white)),
+                        //       child: Row(
+                        //         children: [
+                        //           Container(
+                        //             width: width * 0.6,
+                        //             color: Config.white,
+                        //             padding: const EdgeInsets.all(10),
+                        //             alignment: Alignment.centerLeft,
+                        //             child: Wrap(
+                        //               children: [
+                        //                 Text(
+                        //                   "${ref.watch(cabinProvider)[i]["name"]}",
+                        //                   style: GoogleFonts.mulish(
+                        //                     textStyle: TextStyle(
+                        //                         color: Config.black,
+                        //                         fontSize: width / 34,
+                        //                         fontWeight:
+                        //                             FontWeight.bold),
+                        //                   ),
+                        //                 ),
+                        //               ],
+                        //             ),
+                        //           ),
+                        //           Container(
+                        //             width: width * 0.2,
+                        //             color: Config.white,
+                        //             padding: const EdgeInsets.all(10),
+                        //             child: Center(
+                        //               child: Text(
+                        //                 ref.watch(cabinProvider)[i]
+                        //                         ["status"]
+                        //                     ? "Good"
+                        //                     : "Bad",
+                        //                 style: GoogleFonts.mulish(
+                        //                   textStyle: TextStyle(
+                        //                       color: Config.black,
+                        //                       fontSize: width / 34,
+                        //                       fontWeight: FontWeight.bold),
+                        //                 ),
+                        //               ),
+                        //             ),
+                        //           ),
+                        //           Expanded(
+                        //             child: InkWell(
+                        //               onTap: () {
+                        //                 if (viewList.isEmpty) {
+                        //                   return setState(() {
+                        //                     viewList.add(
+                        //                         ref.watch(cabinProvider)[i]
+                        //                             ["name"]);
+                        //                   });
+                        //                 }
+                        //                 try {
+                        //                   if (viewList.contains(
+                        //                       ref.watch(cabinProvider)[i]
+                        //                           ["name"])) {
+                        //                     setState(() {
+                        //                       viewList.remove(ref.watch(
+                        //                               cabinProvider)[i]
+                        //                           ["name"]);
+                        //                     });
+                        //                   } else {
+                        //                     setState(() {
+                        //                       viewList.add(ref.watch(
+                        //                               cabinProvider)[i]
+                        //                           ["name"]);
+                        //                     });
+                        //                   }
+                        //                 } catch (e) {
+                        //                   setState(() {
+                        //                     viewList.add(
+                        //                         ref.watch(cabinProvider)[i]
+                        //                             ["name"]);
+                        //                   });
+                        //                 }
+                        //               },
+                        //               child: Container(
+                        //                 height: height * 0.07,
+                        //                 padding: const EdgeInsets.all(10),
+                        //                 color: Config.white,
+                        //                 child: Icon(
+                        //                   Icons.visibility,
+                        //                   color: viewList.contains(
+                        //                           ref.watch(
+                        //                                   cabinProvider)[i]
+                        //                               ["name"])
+                        //                       ? Config.theme
+                        //                       : Config.black,
+                        //                 ),
+                        //               ),
+                        //             ),
+                        //           )
+                        //         ],
+                        //       ),
+                        //     ),
+                        //     AnimatedContainer(
+                        //       duration: Duration(milliseconds: 300),
+                        //       margin: EdgeInsets.all(1),
+                        //       decoration: BoxDecoration(
+                        //         border: Border.all(color: Config.underLine),
+                        //         color: Config.bg,
+                        //       ),
+                        //       width: width,
+                        //       height: viewList.contains(
+                        //               ref.watch(cabinProvider)[i]["name"])
+                        //           ? ref
+                        //                   .watch(cabinProvider)[i]["image"]
+                        //                   .isEmpty
+                        //               ? height * 0.07
+                        //               : height * 0.2
+                        //           : 0,
+                        //       child: ref
+                        //               .watch(cabinProvider)[i]["image"]
+                        //               .isEmpty
+                        //           ? Center(
+                        //               child: Text(
+                        //                 "No image found",
+                        //                 style: GoogleFonts.mulish(
+                        //                   textStyle: TextStyle(
+                        //                       color: Config.theme,
+                        //                       fontSize: width / 40,
+                        //                       fontWeight: FontWeight.w400),
+                        //                 ),
+                        //               ),
+                        //             )
+                        //           : Padding(
+                        //               padding: EdgeInsets.all(5),
+                        //               child: ListView(
+                        //                 scrollDirection: Axis.horizontal,
+                        //                 children: [
+                        //                   for (var j = 0;
+                        //                       j <
+                        //                           ref
+                        //                               .watch(cabinProvider)[
+                        //                                   i]["image"]
+                        //                               .length;
+                        //                       j++)
+                        //                     Padding(
+                        //                       padding:
+                        //                           const EdgeInsets.all(8.0),
+                        //                       child: Card(
+                        //                         shape:
+                        //                             RoundedRectangleBorder(
+                        //                           borderRadius:
+                        //                               BorderRadius.circular(
+                        //                                   10),
+                        //                         ),
+                        //                         elevation: 10,
+                        //                         child: Container(
+                        //                           width: width * 0.4,
+                        //                           height: height * 0.17,
+                        //                           decoration: BoxDecoration(
+                        //                             borderRadius:
+                        //                                 BorderRadius
+                        //                                     .circular(10),
+                        //                             border: Border.all(
+                        //                                 color:
+                        //                                     Config.white),
+                        //                           ),
+                        //                           child: ClipRRect(
+                        //                             borderRadius:
+                        //                                 BorderRadius
+                        //                                     .circular(10),
+                        //                             child: Image.file(
+                        //                               ref.watch(
+                        //                                       cabinProvider)[
+                        //                                   i]["image"][j],
+                        //                               fit: BoxFit.cover,
+                        //                             ),
+                        //                           ),
+                        //                         ),
+                        //                       ),
+                        //                     ),
+                        //                 ],
+                        //               ),
+                        //             ),
+                        //     )
+                        //   ],
+                        // ),
                       ],
                     ),
                   ),
@@ -824,7 +1683,7 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                             context: context,
                             height: height,
                             width: width,
-                            content: "Inspection Saved",
+                            content: "Previous Inspection Saved...",
                             success: true,
                           );
                           int count = 0;

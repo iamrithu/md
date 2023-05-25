@@ -1,8 +1,11 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:permission_handler/permission_handler.dart';
+// import 'package:permission_handler/permission_handler.dart';
 
 import '../config/config.dart';
 import '../provider/provider.dart';
@@ -34,6 +37,8 @@ class CustomImageButton extends ConsumerStatefulWidget {
 }
 
 class _CustomImageButtonState extends ConsumerState<CustomImageButton> {
+  ScrollController _scrollController = ScrollController();
+
   String comment = "Good";
   int? imgSetting = null;
   List<File> images = [];
@@ -59,7 +64,7 @@ class _CustomImageButtonState extends ConsumerState<CustomImageButton> {
       }
     }
 
-    void commentFunction() {
+    void commentFunction(bool mandotory, bool action) {
       try {
         Map<String, dynamic> object =
             dataList.firstWhere((e) => e["name"] == widget.lable);
@@ -79,19 +84,32 @@ class _CustomImageButtonState extends ConsumerState<CustomImageButton> {
             elevation: 10,
             backgroundColor: Config.bg,
             shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            title: Text(
-              '${widget.type!}',
-              style: GoogleFonts.mulish(
-                textStyle: TextStyle(
-                    color: Config.theme,
-                    fontSize: width / 25,
-                    fontWeight: FontWeight.bold),
-              ),
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            title: Row(
+              children: [
+                Text(
+                  '${widget.type == "visual_check" ? "Visual Check" : widget.type!}',
+                  style: GoogleFonts.mulish(
+                    textStyle: TextStyle(
+                        color: Config.theme,
+                        fontSize: width / 25,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+                if (mandotory)
+                  Text(
+                    '*',
+                    style: GoogleFonts.mulish(
+                      textStyle: TextStyle(
+                          color: Config.black,
+                          fontSize: width / 30,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  )
+              ],
             ),
             content: Container(
-              width: 500,
-              height: 200,
+              constraints: BoxConstraints(minHeight: 200),
               child: SingleChildScrollView(
                 child: ListBody(
                   children: <Widget>[
@@ -111,32 +129,39 @@ class _CustomImageButtonState extends ConsumerState<CustomImageButton> {
                     SizedBox(
                       height: 5,
                     ),
-                    TextFormField(
-                      initialValue: comment,
-                      keyboardType: TextInputType.emailAddress,
-                      style: TextStyle(
-                          fontWeight: FontWeight.normal, color: Colors.black),
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Config.white,
-                        contentPadding:
-                            EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Config.theme),
-                          borderRadius: BorderRadius.circular(4),
+                    Scrollbar(
+                      controller: _scrollController,
+                      thumbVisibility: true,
+                      trackVisibility: true,
+                      child: TextFormField(
+                        initialValue: comment,
+                        keyboardType: TextInputType.emailAddress,
+                        style: TextStyle(
+                            fontWeight: FontWeight.normal,
+                            color: Color.fromARGB(255, 66, 65, 65),
+                            fontSize: width / 30),
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Config.white,
+                          contentPadding:
+                              EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Config.theme),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Config.theme),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Config.theme),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
+                        onChanged: (value) {
+                          setState(() {
+                            comment = value;
+                          });
+                        },
+                        minLines: 4,
+                        maxLines: 10,
                       ),
-                      onChanged: (value) {
-                        setState(() {
-                          comment = value;
-                        });
-                      },
-                      minLines: 5,
-                      maxLines: 5,
                     ),
                     CustomButton(
                       boderColor: Config.white,
@@ -192,22 +217,24 @@ class _CustomImageButtonState extends ConsumerState<CustomImageButton> {
           dataList.add({
             "type": widget.type,
             "name": widget.lable,
-            "comment": comment,
+            "comment": "--",
             "status": false,
             "image": images
           });
         });
         reloadProvider(dataList);
-
-        return;
+        return commentFunction(true, false);
       }
       try {
         Map<String, dynamic> object =
             dataList.firstWhere((e) => e["name"] == widget.lable);
         if (object["status"]) {
           object["status"] = false;
+          object["comment"] = "--";
+          commentFunction(true, false);
         } else {
           object["status"] = true;
+          object["comment"] = "";
         }
         reloadProvider(dataList);
       } catch (e) {
@@ -215,12 +242,14 @@ class _CustomImageButtonState extends ConsumerState<CustomImageButton> {
           dataList.add({
             "type": widget.type,
             "name": widget.lable,
-            "comment": comment,
+            "comment": "--",
             "status": false,
             "image": images
           });
         });
+
         reloadProvider(dataList);
+        commentFunction(true, false);
       }
     }
 
@@ -286,7 +315,7 @@ class _CustomImageButtonState extends ConsumerState<CustomImageButton> {
         }
 
         if (widget.btnType == "others") return widget.click();
-        if (widget.btnType == "comments") return commentFunction();
+        if (widget.btnType == "comments") return commentFunction(false, false);
         if (widget.btnType == "status") return statusFunction();
         if (widget.btnType == "image") return imageFunction();
       },

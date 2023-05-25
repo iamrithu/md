@@ -8,6 +8,7 @@ import 'package:md/config/config.dart';
 import 'package:md/provider/provider.dart';
 import 'package:md/screen/login-screen/login.dart';
 import 'package:md/screen/report-screen/reportScreen.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../widgets/customDetailContainer.dart';
@@ -40,48 +41,38 @@ class _DriverScreenState extends ConsumerState<DriverScreen> {
                 height: height * 0.07,
                 alignment: Alignment.centerLeft,
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    InkWell(
-                      splashColor: Config.white,
-                      onTap: () {
-                        SystemNavigator.pop();
-                      },
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20.0),
-                        child: Icon(
-                          Icons.arrow_back_ios,
-                          color: Config.white,
-                        ),
-                      ),
-                      // child: SizedBox(
-                      //   height: height * 0.05,
-                      //   child: Row(
-                      //     children: [
-                      //       SizedBox(
-                      //         width: 20,
-                      //       ),
-                      //       Icon(
-                      //         Icons.arrow_back_ios,
-                      //         color: Config.white,
-                      //         size: width / 30,
-                      //       ),
-                      //       SizedBox(
-                      //         width: 10,
-                      //       ),
-                      //       Text(
-                      //         "Back",
-                      //         style: GoogleFonts.mulish(
-                      //           textStyle: TextStyle(
-                      //               color: Config.white,
-                      //               fontSize: width / 30,
-                      //               fontWeight: FontWeight.bold),
-                      //         ),
-                      //       ),
-                      //     ],
-                      //   ),
-                      // ),
-                    ),
+                    // Card(
+                    //   shape: RoundedRectangleBorder(
+                    //     borderRadius: BorderRadius.circular(4),
+                    //     // side: const BorderSide(color: Config.theme),
+                    //   ),
+                    //   margin: EdgeInsets.only(
+                    //       left: 12, top: 6, right: 6, bottom: 6),
+                    //   child: Center(
+                    //       child: ClipRRect(
+                    //     borderRadius: BorderRadius.circular(4),
+                    //     child: Image.asset(
+                    //       "assets/logo.png",
+                    //       scale: 1.5,
+                    //     ),
+                    //   )),
+                    // ),
+                    // InkWell(
+                    //   splashColor: Config.white,
+                    //   onTap: () {
+                    //     SystemNavigator.pop();
+                    //   },
+                    //   child: Padding(
+                    //     padding: EdgeInsets.symmetric(horizontal: 20.0),
+                    //     child: Icon(
+                    //       Icons.arrow_back_ios,
+                    //       color: Config.white,
+                    //     ),
+                    //   ),
+
+                    // ),
                     InkWell(
                       splashColor: Config.white,
                       onTap: () async {
@@ -216,6 +207,15 @@ class _DriverScreenState extends ConsumerState<DriverScreen> {
                                     success: false,
                                   );
                                 }
+                                // Navigator.push(
+                                //     context,
+                                //     PageTransition(
+                                //         type: PageTransitionType.size,
+                                //         duration: Duration(milliseconds: 300),
+                                //         alignment: Alignment.topRight,
+                                //         child: ReportScreen(),
+                                //         isIos: true));
+
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (context) => ReportScreen(),

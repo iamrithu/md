@@ -2,10 +2,12 @@
 
 import 'dart:io';
 
+import 'package:camera/camera.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/cupertino.dart';
+import "package:flutter/services.dart";
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -14,6 +16,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:md/config/config.dart';
 import 'package:md/widgets/globalButtonWidget.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../api/api.dart';
 import '../../provider/provider.dart';
@@ -57,16 +60,6 @@ class _IncidentScreenState extends ConsumerState<IncidentScreen> {
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
-    compressImage(File file) async {
-      final result = await FlutterImageCompress.compressAndGetFile(
-        file.absolute.path,
-        file.absolute.path,
-        quality: 50,
-        minWidth: 800,
-        minHeight: 800,
-      );
-      return result;
-    }
 
     Future<bool> _handleLocationPermission() async {
       bool serviceEnabled;
@@ -104,6 +97,9 @@ class _IncidentScreenState extends ConsumerState<IncidentScreen> {
                 'Location permissions are permanently denied, we cannot request permissions.'),
           ),
         );
+        setState(() {
+          isLoading = false;
+        });
         return false;
       }
       return true;
@@ -272,7 +268,7 @@ class _IncidentScreenState extends ConsumerState<IncidentScreen> {
                           Row(
                             children: [
                               Text(
-                                "Date of incident",
+                                "Date of incident*",
                                 style: GoogleFonts.mulish(
                                   textStyle: TextStyle(
                                     color: Config.black,
@@ -336,7 +332,7 @@ class _IncidentScreenState extends ConsumerState<IncidentScreen> {
                               Row(
                                 children: [
                                   Text(
-                                    "Location",
+                                    "Location*",
                                     style: GoogleFonts.mulish(
                                       textStyle: TextStyle(
                                           color: Config.black,
@@ -415,7 +411,7 @@ class _IncidentScreenState extends ConsumerState<IncidentScreen> {
                             hide: false,
                             width: width,
                             controller: _witnessController,
-                            lable: "Witnessed by",
+                            lable: "Witnessed by*",
                           ),
                           SizedBox(
                             height: 10,
@@ -424,7 +420,7 @@ class _IncidentScreenState extends ConsumerState<IncidentScreen> {
                             hide: false,
                             width: width,
                             controller: _witnessNumberController,
-                            lable: "Phone Number of Witness",
+                            lable: "Phone Number of Witness*",
                           ),
                           SizedBox(
                             height: 10,
@@ -450,28 +446,35 @@ class _IncidentScreenState extends ConsumerState<IncidentScreen> {
                                   txtColor: Config.white,
                                   bgColor: Config.theme,
                                   click: () async {
-                                    FilePickerResult? result =
-                                        await FilePicker.platform.pickFiles(
-                                            allowMultiple: true,
-                                            type: FileType.image);
+                                    try {
+                                      final ImagePicker picker = ImagePicker();
 
-                                    if (result != null) {
-                                      List<File?> files = result.paths
-                                          .map((path) => File(path!))
-                                          .toList();
+                                      final List<XFile> result =
+                                          await picker.pickMultiImage();
 
-                                      for (var i = 0; i < files.length; i++) {
-                                        setState(() {
-                                          images.add(files[i]!);
-                                        });
+                                      if (result.isNotEmpty) {
+                                        List<File> files = result
+                                            .map((path) => File(path.path))
+                                            .toList();
+
+                                        for (var i = 0; i < files.length; i++) {
+                                          setState(() {
+                                            images.add(files[i]);
+                                          });
+                                        }
                                       }
-                                    } else {
-                                      // User canceled the picker
+                                    } catch (e) {
+                                      var status =
+                                          await Permission.photos.status;
+                                      if (status.isDenied) {
+                                        customAlertPermistion(context, width,
+                                            "Allow access to gallery and photos");
+                                      }
                                     }
                                   },
                                   width: width * 0.4,
                                   height: height * 0.07,
-                                  lable: "Gallary",
+                                  lable: "Gallery",
                                 ),
                                 CustomButton(
                                   boderColor: Config.white,
@@ -480,37 +483,35 @@ class _IncidentScreenState extends ConsumerState<IncidentScreen> {
                                   bgColor: Config.theme,
                                   click: () async {
                                     final ImagePicker _picker = ImagePicker();
-
                                     try {
-                                      final image = await _picker.pickImage(
-                                          imageQuality: 20,
-                                          source: ImageSource.camera,
-                                          preferredCameraDevice:
-                                              CameraDevice.rear);
-
+                                      final XFile? image =
+                                          await _picker.pickImage(
+                                              imageQuality: 100,
+                                              source: ImageSource.camera,
+                                              preferredCameraDevice:
+                                                  CameraDevice.rear);
                                       if (image == null)
                                         return customAlert(
                                             context: context,
                                             height: height,
                                             width: width,
-                                            content:
-                                                "your camera image is null",
+                                            content: "No image captured",
                                             success: false);
                                       ;
-                                      File imageTemporay = File(image.path);
+                                      // File newfile =
+                                      //     await testCompressAndGetFile(
+                                      //         File(image.path));
                                       setState(() {
-                                        images.add(imageTemporay);
+                                        images.add(File(image.path));
                                       });
-                                    } on PlatformException catch (e) {
-                                      customAlert(
-                                          context: context,
-                                          height: height,
-                                          width: width,
-                                          content: "Failed to pick image",
-                                          success: false);
-                                      print("Failed to pick image : $e");
+                                    } catch (e) {
+                                      var status =
+                                          await Permission.camera.status;
+                                      if (status.isDenied) {
+                                        customAlertPermistion(context, width,
+                                            "Allow access to camera");
+                                      }
                                     }
-                                    // Navigator.pop(context);
                                   },
                                   width: width * 0.4,
                                   height: height * 0.07,
@@ -527,73 +528,77 @@ class _IncidentScreenState extends ConsumerState<IncidentScreen> {
                                 scrollDirection: Axis.horizontal,
                                 children: [
                                   for (var i = 0; i < images.length; i++)
-                                    Container(
-                                      width: width * 0.4,
-                                      height: height * 0.17,
-                                      margin: EdgeInsets.all(10),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        border: Border.all(color: Config.theme),
-                                      ),
-                                      child: Stack(
-                                        children: [
-                                          Container(
-                                            width: width,
-                                            height: height * 0.17,
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              border: Border.all(
-                                                  color: Config.white),
-                                            ),
-                                            child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              child: Image.file(
-                                                images[i],
-                                                fit: BoxFit.contain,
+                                    Card(
+                                      elevation: 5,
+                                      child: Container(
+                                        width: width * 0.85,
+                                        height: height * 0.17,
+                                        margin: EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(4),
+                                        ),
+                                        child: Stack(
+                                          children: [
+                                            Container(
+                                              width: width * 0.85,
+                                              height: height * 0.17,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(4),
+                                                border: Border.all(
+                                                    color: Config.white),
+                                              ),
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(4),
+                                                child: Image.file(
+                                                  images[i],
+                                                  fit: BoxFit.contain,
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                          Container(
-                                            width: width,
-                                            height: height * 0.17,
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              border: Border.all(
-                                                  color: Config.white),
-                                            ),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.end,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                InkWell(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      images.remove(images[i]);
-                                                    });
-                                                  },
-                                                  child: Card(
-                                                    elevation: 10,
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              5.0),
-                                                      child: Icon(
-                                                        Icons.delete,
-                                                        color: Config.theme,
-                                                        size: width / 30,
+                                            Container(
+                                              width: width * 0.85,
+                                              height: height * 0.17,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                border: Border.all(
+                                                    color: Config.white),
+                                              ),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.end,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  InkWell(
+                                                    onTap: () {
+                                                      setState(() {
+                                                        images
+                                                            .remove(images[i]);
+                                                      });
+                                                    },
+                                                    child: Card(
+                                                      elevation: 10,
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(5.0),
+                                                        child: Icon(
+                                                          Icons.delete,
+                                                          color: Config.theme,
+                                                          size: width / 30,
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
-                                                ),
-                                              ],
+                                                ],
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
                                     ),
                                 ],
@@ -606,7 +611,7 @@ class _IncidentScreenState extends ConsumerState<IncidentScreen> {
                   Container(
                     margin: EdgeInsets.only(left: 20, right: 20, bottom: 20),
                     width: width,
-                    height: height * 0.07,
+                    height: height * 0.05,
                     child: CustomButton(
                       boderColor: Config.white,
                       radius: 4,
@@ -653,7 +658,7 @@ class _IncidentScreenState extends ConsumerState<IncidentScreen> {
                       child: Padding(
                         padding: EdgeInsets.all(5),
                         child: Text(
-                          "Proccessing...",
+                          "processing.",
                           style: GoogleFonts.mulish(
                             textStyle: TextStyle(
                                 color: Config.theme,

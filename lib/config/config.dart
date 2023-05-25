@@ -1,5 +1,9 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class Config {
   static const String URL = "https://vehicle.paravsoftware.co.uk/";
@@ -71,6 +75,64 @@ customAlert({context, width, height, success, content, String? content2}) {
       behavior: SnackBarBehavior.floating,
       backgroundColor: Colors.transparent,
       elevation: 0,
+    ),
+  );
+}
+
+customAlertPermistion(context, width, content) {
+  showCupertinoDialog(
+    context: context,
+    builder: (BuildContext context) => CupertinoAlertDialog(
+      title: Text(
+        "Permission Denied",
+        style: GoogleFonts.mulish(
+          textStyle: TextStyle(
+            color: Config.black,
+            fontSize: width / 24,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+      content: Text(
+        content.toString(),
+        style: GoogleFonts.mulish(
+          textStyle: TextStyle(
+            color: Config.black,
+            fontSize: width / 30,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+      actions: [
+        CupertinoDialogAction(
+          onPressed: () => Navigator.pop(context),
+          child: Text(
+            "Cancel",
+            style: GoogleFonts.mulish(
+              textStyle: TextStyle(
+                fontSize: width / 28,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ),
+        CupertinoDialogAction(
+          isDefaultAction: true,
+          onPressed: () {
+            Navigator.pop(context);
+            openAppSettings();
+          },
+          child: Text(
+            "Settings",
+            style: GoogleFonts.mulish(
+              textStyle: TextStyle(
+                fontSize: width / 28,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        )
+      ],
     ),
   );
 }

@@ -112,8 +112,8 @@ class _CustomCheckDetailScreenState
           borderRadius: BorderRadius.circular(100),
           border: Border.all(
               color: isAdded()
-                  ? Color.fromARGB(255, 184, 251, 199)
-                  : Color.fromARGB(255, 239, 172, 177))),
+                  ? Color.fromARGB(255, 149, 255, 172)
+                  : Color.fromARGB(255, 255, 149, 156))),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

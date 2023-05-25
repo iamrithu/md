@@ -109,6 +109,7 @@ class Api {
 
     try {
       FormData data = FormData();
+
       data.fields.add(MapEntry("type", type));
       for (var i = 0; i < datas.length; i++) {
         data.fields
@@ -119,6 +120,7 @@ class Api {
             datas[i]["comment"].isEmpty ? "--" : datas[i]["comment"]));
         data.fields.add(MapEntry("status[${datas[i]["name"]}]",
             datas[i]["status"] ? "Good" : "Bad"));
+
         for (var j = 0; j < datas[i]["image"].length; j++) {
           String fileName = datas[i]["image"][j].path.split('/').last;
           data.files.add(
@@ -142,11 +144,8 @@ class Api {
               headers: {
                 "Accept": "application/json",
               }));
-      print(response.toString());
       return response;
     } on DioError catch (e) {
-      print(e.response.toString());
-
       return e.response;
     }
   }

@@ -26,7 +26,7 @@ final visualProvider = StateProvider<List<Map<String, dynamic>>>((state) {
       "status": true
     },
     {
-      "name": "Near side",
+      "name": "Near-Side",
       "type": "visual_check",
       "image": [],
       "comment": "",
